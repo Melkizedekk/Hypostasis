@@ -1,158 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>retro-term // blog</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- Monospace fonts: JetBrains Mono via Google Fonts, fallback to system monospace -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>~/blog — Retro Terminal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
-  <!-- Top bar (Polybar style) -->
-  <header class="top-bar">
-    <div class="top-left">
-      <span class="accent-cyan">[blog@retro]</span>
-      <span class="top-workspace">1:web</span>
-      <span class="top-workspace">2:term</span>
-      <span class="top-workspace active">3:posts</span>
+    <!-- Top Bar (Polybar-style) -->
+    <div class="topbar" id="topbar">
+        <div class="topbar-left">
+            <span class="topbar-workspace active">1</span>
+            <span class="topbar-workspace">2</span>
+            <span class="topbar-workspace">3</span>
+            <span class="topbar-workspace">4</span>
+            <span class="topbar-separator">|</span>
+            <span class="topbar-title">~/blog</span>
+        </div>
+        <div class="topbar-center">
+            <span class="topbar-cpu" id="cpu-graph"></span>
+            <span class="topbar-separator">|</span>
+            <span class="topbar-mem" id="mem-bar"></span>
+        </div>
+        <div class="topbar-right">
+            <span class="topbar-stat" id="topbar-cpu">CPU: 12%</span>
+            <span class="topbar-stat" id="topbar-ram">RAM: 2.4G/16G</span>
+            <span class="topbar-stat" id="topbar-temp">66°C</span>
+            <span class="topbar-stat" id="topbar-net">↓ 58.3 MiB ↑ 1.71 MiB</span>
+            <span class="topbar-clock" id="topbar-clock">Sun 09 Aug 17:15</span>
+        </div>
     </div>
-    <div class="top-center">
-      <span class="accent-purple">blog.terminal</span>
-    </div>
-    <div class="top-right">
-      <span class="cpu-stats">
-        <span class="accent-green">CPU</span>
-        <span class="cpu-bar-bg"><span class="cpu-bar-fill" id="cpu-fill"></span></span>
-        <span id="cpu-value">0%</span>
-      </span>
-      <span class="ram-stats">
-        <span class="accent-green">RAM</span>
-        <span class="ram-bar-bg"><span class="ram-bar-fill" id="ram-fill"></span></span>
-        <span id="ram-value">0%</span>
-      </span>
-      <span class="date-time" id="datetime"></span>
-    </div>
-  </header>
 
-  <!-- Main tiling area -->
-  <main class="tiling-grid">
-
-    <!-- Left panel: About / neofetch style -->
-    <aside class="panel about-panel">
-      <div class="panel-header">
-        <span class="panel-title">~ about.me</span>
-        <span class="panel-close">×</span>
-      </div>
-      <div class="panel-content">
-        <div class="neofetch">
-          <div class="neofetch-logo">
-            <span class="ascii-art">
-        .---.
-       /     \
-      | () () |
-       \  ^  /
-        |||||
-        |||||
-            </span>
-          </div>
-          <div class="neofetch-info">
-            <div><span class="accent-cyan">user</span>@<span class="accent-cyan">retro</span></div>
-            <div>---------------</div>
-            <div><span class="accent-purple">OS</span>: Arch Linux x86_64</div>
-            <div><span class="accent-purple">Host</span>: Tiling WM Blog</div>
-            <div><span class="accent-purple">Kernel</span>: 6.8.1-arch1</div>
-            <div><span class="accent-purple">Uptime</span>: 4 days, 2 hours</div>
-            <div><span class="accent-purple">Shell</span>: zsh 5.9</div>
-            <div><span class="accent-purple">Terminal</span>: alacritty</div>
-            <div><span class="accent-purple">WM</span>: bspwm</div>
-            <div><span class="accent-purple">Theme</span>: Tokyo Night</div>
-            <div><span class="accent-purple">Font</span>: JetBrains Mono</div>
-            <div class="neofetch-colors">
-              <span class="block" style="background:#1a1b26;"></span>
-              <span class="block" style="background:#c0caf5;"></span>
-              <span class="block" style="background:#7dcfff;"></span>
-              <span class="block" style="background:#bb9af7;"></span>
-              <span class="block" style="background:#9ece6a;"></span>
-              <span class="block" style="background:#f7768e;"></span>
+    <!-- Main Tiling Layout -->
+    <div class="tiling-container">
+        <!-- Panel 1: ASCII Art / Visual -->
+        <div class="panel panel-visual" id="panel-visual">
+            <div class="panel-header">
+                <span class="panel-title">ascii</span>
+                <span class="panel-controls">
+                    <span class="ctrl-min">─</span>
+                    <span class="ctrl-max">□</span>
+                    <span class="ctrl-close">✕</span>
+                </span>
             </div>
-          </div>
+            <div class="panel-content visual-content">
+                <pre id="ascii-art"></pre>
+            </div>
         </div>
-      </div>
-    </aside>
 
-    <!-- Right panel: Main blog posts (terminal style) -->
-    <section class="panel posts-panel">
-      <div class="panel-header">
-        <span class="panel-title">[ user@blog ~ ] $ _</span>
-        <span class="panel-close">×</span>
-      </div>
-      <div class="panel-content posts-content">
-        <div class="terminal-header">
-          <span class="accent-cyan">ls -la /var/blog/posts/</span>
-          <span class="blinking-cursor">█</span>
+        <!-- Panel 2: System Stats (htop-style) -->
+        <div class="panel panel-stats" id="panel-stats">
+            <div class="panel-header">
+                <span class="panel-title">cpu</span>
+                <span class="panel-controls">
+                    <span class="ctrl-min">─</span>
+                    <span class="ctrl-max">□</span>
+                    <span class="ctrl-close">✕</span>
+                </span>
+            </div>
+            <div class="panel-content stats-content">
+                <div class="stats-header">
+                    <span>i5-6440HQ</span>
+                    <span>2.7 GHz</span>
+                </div>
+                <div class="stats-row">
+                    <span>CPU</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar" id="stat-cpu-bar" style="width: 52%"></div>
+                    </div>
+                    <span id="stat-cpu-pct">52%</span>
+                    <span id="stat-cpu-temp">66°C 19.6W</span>
+                </div>
+                <div class="stats-cores">
+                    <div class="core-row"><span>C0</span><span class="core-bar-wrap"><div class="core-bar" style="width:49%"></div></span><span>49%</span><span>63°C</span><span>C2</span><span class="core-bar-wrap"><div class="core-bar" style="width:53%"></div></span><span>53%</span><span>60°C</span></div>
+                    <div class="core-row"><span>C1</span><span class="core-bar-wrap"><div class="core-bar" style="width:50%"></div></span><span>50%</span><span>62°C</span><span>C3</span><span class="core-bar-wrap"><div class="core-bar" style="width:55%"></div></span><span>55%</span><span>59°C</span></div>
+                </div>
+                <div class="stats-divider">total ▲▼ gpu-totals</div>
+                <div class="stats-row">
+                    <span>GPU</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar gpu-bar" style="width: 56%"></div>
+                    </div>
+                    <span>56%</span>
+                    <span>5.02W</span>
+                </div>
+                <div class="stats-uptime" id="stats-uptime">up 00:10:35</div>
+            </div>
         </div>
-        <div class="post-list" id="post-list">
-          <!-- Posts will be injected by JS -->
-        </div>
-        <div class="terminal-footer">
-          <span class="accent-green">total</span> <span id="post-count">0</span> posts
-          <span class="accent-purple">|</span> <span id="current-date"></span>
-        </div>
-      </div>
-    </section>
 
-    <!-- Bottom panel: Tags / file manager style -->
-    <aside class="panel tags-panel">
-      <div class="panel-header">
-        <span class="panel-title">~ tags</span>
-        <span class="panel-close">×</span>
-      </div>
-      <div class="panel-content">
-        <div class="tags-list">
-          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">linux</span> <span class="tag-count">(12)</span></div>
-          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">css</span> <span class="tag-count">(8)</span></div>
-          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">javascript</span> <span class="tag-count">(15)</span></div>
-          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">terminal</span> <span class="tag-count">(5)</span></div>
-          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">design</span> <span class="tag-count">(7)</span></div>
-          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">productivity</span> <span class="tag-count">(3)</span></div>
-          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">arch</span> <span class="tag-count">(9)</span></div>
-          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">dotfiles</span> <span class="tag-count">(4)</span></div>
+        <!-- Panel 3: Main Blog Content (Terminal) -->
+        <div class="panel panel-main" id="panel-main">
+            <div class="panel-header">
+                <span class="panel-title">blog</span>
+                <span class="panel-controls">
+                    <span class="ctrl-min">─</span>
+                    <span class="ctrl-max">□</span>
+                    <span class="ctrl-close">✕</span>
+                </span>
+            </div>
+            <div class="panel-content terminal-content">
+                <div class="terminal-prompt">
+                    <span class="prompt-user">user</span><span class="prompt-at">@</span><span class="prompt-host">blog</span>
+                    <span class="prompt-path"> ~/posts </span>
+                    <span class="prompt-symbol">$</span>
+                    <span class="prompt-cmd">ls -la</span>
+                    <span class="cursor-blink">█</span>
+                </div>
+                <div class="terminal-output" id="blog-list">
+                    <!-- Blog posts injected by JS -->
+                </div>
+            </div>
         </div>
-        <div class="tags-footer">
-          <span class="accent-purple">/</span> <span class="accent-green">total tags:</span> 8
+
+        <!-- Panel 4: Memory/Disks -->
+        <div class="panel panel-memory" id="panel-memory">
+            <div class="panel-header">
+                <span class="panel-title">mem</span>
+                <span class="panel-controls">
+                    <span class="ctrl-min">─</span>
+                    <span class="ctrl-max">□</span>
+                    <span class="ctrl-close">✕</span>
+                </span>
+            </div>
+            <div class="panel-content memory-content">
+                <div class="mem-section">
+                    <div class="mem-row"><span>Total:</span><span>11.5 GiB</span></div>
+                    <div class="mem-row"><span>Used:</span><span>2.47 GiB</span><div class="mem-bar-wrap"><div class="mem-bar used-bar" style="width:21%"></div></div><span>21%</span></div>
+                    <div class="mem-row"><span>Avail:</span><span>9.09 GiB</span></div>
+                    <div class="mem-row"><span>Cache:</span><span>2.14 GiB</span><div class="mem-bar-wrap"><div class="mem-bar cache-bar" style="width:79%"></div></div><span>79%</span></div>
+                    <div class="mem-row"><span>Free:</span><span>7.56 GiB</span><div class="mem-bar-wrap"><div class="mem-bar free-bar" style="width:19%"></div></div><span>19%</span></div>
+                </div>
+                <div class="mem-divider">disks</div>
+                <div class="disk-section">
+                    <div class="disk-row"><span>root</span><span>20G</span></div>
+                    <div class="disk-row"><span>IO</span></div>
+                    <div class="disk-row"><span>U</span><div class="disk-bar-wrap"><div class="disk-bar" style="width:13%"></div></div><span>13G</span></div>
+                    <div class="disk-row"><span>swap</span><span>4.0G</span></div>
+                    <div class="disk-row"><span>U</span><div class="disk-bar-wrap"><div class="disk-bar" style="width:0%"></div></div><span>0B</span></div>
+                    <div class="disk-row"><span>home</span><span>28G</span></div>
+                    <div class="disk-row"><span>56K</span></div>
+                    <div class="disk-row"><span>U</span><div class="disk-bar-wrap"><div class="disk-bar" style="width:11%"></div></div><span>11G</span></div>
+                    <div class="disk-row"><span>boot</span><span>1.0G</span></div>
+                </div>
+            </div>
         </div>
-      </div>
-    </aside>
 
-  </main>
+        <!-- Panel 5: Network -->
+        <div class="panel panel-net" id="panel-net">
+            <div class="panel-header">
+                <span class="panel-title">net</span>
+                <span class="panel-controls">
+                    <span class="ctrl-min">─</span>
+                    <span class="ctrl-max">□</span>
+                    <span class="ctrl-close">✕</span>
+                </span>
+            </div>
+            <div class="panel-content net-content">
+                <div class="net-section">
+                    <div class="net-label">download</div>
+                    <div class="net-row"><span>▼ 0 Byte/s</span></div>
+                    <div class="net-row"><span>▼ Top: (936 bitp)</span></div>
+                    <div class="net-row"><span>▲ Total: 58.3 MiB</span></div>
+                    <div class="net-label">upload</div>
+                    <div class="net-row"><span>▲ 0 Byte/s</span></div>
+                    <div class="net-row"><span>▲ Top: (456 bitp)</span></div>
+                    <div class="net-row"><span>▼ Total: 1.71 MiB</span></div>
+                </div>
+            </div>
+        </div>
 
-  <!-- Fake terminal command line at the bottom -->
-  <div class="terminal-input-bar">
-    <span class="prompt">[user@blog ~]$</span>
-    <input type="text" id="terminal-input" class="terminal-input" placeholder="type 'help' for commands..." autocomplete="off" spellcheck="false">
-    <span class="blinking-cursor-static">█</span>
-  </div>
+        <!-- Panel 6: About / Neofetch -->
+        <div class="panel panel-about" id="panel-about">
+            <div class="panel-header">
+                <span class="panel-title">about</span>
+                <span class="panel-controls">
+                    <span class="ctrl-min">─</span>
+                    <span class="ctrl-max">□</span>
+                    <span class="ctrl-close">✕</span>
+                </span>
+            </div>
+            <div class="panel-content about-content">
+                <div class="neofetch">
+                    <pre class="neofetch-ascii">
+     _____
+    /  ___|
+    \ `--.  ___  _ __ ___
+     `--. \/ _ \| '_ ` _ \
+    /\__/ / (_) | | | | | |
+    \____/ \___/|_| |_| |_|
+                    </pre>
+                    <div class="neofetch-info">
+                        <div class="neofetch-line"><span class="nf-label">user</span><span class="nf-sep">@</span><span class="nf-host">blog</span></div>
+                        <div class="neofetch-line"><span class="nf-sep">─────────────</span></div>
+                        <div class="neofetch-line"><span class="nf-key">OS:</span> <span class="nf-val">Arch Linux x86_64</span></div>
+                        <div class="neofetch-line"><span class="nf-key">Host:</span> <span class="nf-val">Retro Terminal Blog</span></div>
+                        <div class="neofetch-line"><span class="nf-key">Kernel:</span> <span class="nf-val">6.1.0-arch</span></div>
+                        <div class="neofetch-line"><span class="nf-key">Uptime:</span> <span class="nf-val" id="nf-uptime">10 mins</span></div>
+                        <div class="neofetch-line"><span class="nf-key">Shell:</span> <span class="nf-val">zsh 5.9</span></div>
+                        <div class="neofetch-line"><span class="nf-key">WM:</span> <span class="nf-val">bspwm</span></div>
+                        <div class="neofetch-line"><span class="nf-key">Terminal:</span> <span class="nf-val">kitty</span></div>
+                        <div class="neofetch-line"><span class="nf-key">CPU:</span> <span class="nf-val">i5-6440HQ @ 2.7GHz</span></div>
+                        <div class="neofetch-line"><span class="nf-key">GPU:</span> <span class="nf-val">Intel HD 530</span></div>
+                        <div class="neofetch-line"><span class="nf-key">Memory:</span> <span class="nf-val">2470MiB / 11520MiB</span></div>
+                        <div class="neofetch-colors">
+                            <span class="nf-color" style="background:#1a1b26"></span>
+                            <span class="nf-color" style="background:#7dcfff"></span>
+                            <span class="nf-color" style="background:#bb9af7"></span>
+                            <span class="nf-color" style="background:#9ece6a"></span>
+                            <span class="nf-color" style="background:#f7768e"></span>
+                            <span class="nf-color" style="background:#e0af68"></span>
+                            <span class="nf-color" style="background:#7aa2f7"></span>
+                            <span class="nf-color" style="background:#c0caf5"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-text">
+                    <p>Hi, I'm a developer who loves Linux, minimalism, and the terminal. This blog is my digital garden — a place where I share thoughts on code, design, and open source.</p>
+                    <p class="about-links">
+                        <a href="#" class="about-link">[GitHub]</a>
+                        <a href="#" class="about-link">[Twitter]</a>
+                        <a href="#" class="about-link">[RSS]</a>
+                    </p>
+                </div>
+            </div>
+        </div>
 
-  <!-- Modal overlay for post reading -->
-  <div class="modal-overlay" id="modal-overlay">
-    <div class="modal-window">
-      <div class="modal-header">
-        <span class="modal-title" id="modal-title">post.md</span>
-        <span class="modal-close" id="modal-close">×</span>
-      </div>
-      <div class="modal-body" id="modal-body">
-        <!-- Post content injected here -->
-      </div>
-      <div class="modal-footer">
-        <span class="accent-purple">--</span> <span id="modal-footer-text">press ESC to close</span> <span class="accent-purple">--</span>
-      </div>
+        <!-- Panel 7: Tags -->
+        <div class="panel panel-tags" id="panel-tags">
+            <div class="panel-header">
+                <span class="panel-title">tags</span>
+                <span class="panel-controls">
+                    <span class="ctrl-min">─</span>
+                    <span class="ctrl-max">□</span>
+                    <span class="ctrl-close">✕</span>
+                </span>
+            </div>
+            <div class="panel-content tags-content" id="tags-list">
+                <!-- Tags injected by JS -->
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script src="script.js"></script>
+    <!-- Bottom Command Bar -->
+    <div class="command-bar" id="command-bar">
+        <span class="cmd-prompt">user@blog:~$</span>
+        <input type="text" class="cmd-input" id="cmd-input" placeholder="type 'help' for commands..." autocomplete="off" spellcheck="false">
+        <span class="cursor-blink cmd-cursor">█</span>
+    </div>
+
+    <!-- Post Modal (Terminal Window Overlay) -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-window" id="modal-window">
+            <div class="modal-header">
+                <span class="modal-title" id="modal-title">post</span>
+                <span class="modal-controls">
+                    <span class="ctrl-min">─</span>
+                    <span class="ctrl-max">□</span>
+                    <span class="ctrl-close" id="modal-close">✕</span>
+                </span>
+            </div>
+            <div class="modal-content" id="modal-content">
+                <!-- Post content injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
