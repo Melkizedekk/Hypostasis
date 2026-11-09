@@ -187,11 +187,11 @@
       position: relative;
       background: var(--space-indigo);
       overflow: hidden;
-      padding: 60px 24px 80px;
+      padding: 80px 24px 100px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 90vh;
+      min-height: 85vh;
       justify-content: center;
       background-image:
         repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(112, 115, 134, 0.12) 59px, rgba(112, 115, 134, 0.12) 60px),
@@ -245,162 +245,50 @@
       100% { transform: translateY(200%); }
     }
 
-    /* ─── CRT TV FRAME ─── */
-    .tv-wrapper {
+    /* ─── HERO CONTENT ─── */
+    .hero-content {
       position: relative;
       z-index: 2;
-      perspective: 1200px;
-      animation: tv-flicker 4s ease-in-out infinite;
-    }
-    @keyframes tv-flicker {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.92; }
-    }
-
-    .tv-frame {
-      background: var(--space-indigo);
-      border: 3px solid var(--slate-grey);
-      border-radius: 16px;
-      padding: 18px 18px 38px 18px;
-      box-shadow:
-        0 0 0 2px var(--shadow-grey),
-        0 12px 0 0 var(--shadow-grey),
-        0 0 40px 8px rgba(127, 139, 178, 0.08);
-      position: relative;
-      display: inline-block;
-      transform: rotateX(1deg) rotateY(-1deg);
-    }
-    .tv-frame::after {
-      content: '';
-      position: absolute;
-      right: -2px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 6px;
-      height: 60px;
-      background: repeating-linear-gradient(
-        0deg,
-        var(--slate-grey) 0px,
-        var(--slate-grey) 2px,
-        transparent 2px,
-        transparent 5px
-      );
-      border-radius: 0 2px 2px 0;
-      opacity: 0.6;
-    }
-    .tv-knobs {
-      position: absolute;
-      bottom: 8px;
-      right: 18px;
-      display: flex;
-      gap: 8px;
-    }
-    .tv-knob {
-      width: 14px;
-      height: 14px;
-      background: var(--slate-grey);
-      border: 2px solid var(--shadow-grey);
-      border-radius: 50%;
-      position: relative;
-    }
-    .tv-knob::after {
-      content: '';
-      position: absolute;
-      top: 2px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 2px;
-      height: 5px;
-      background: var(--ink-black);
-    }
-    .tv-brand-label {
-      position: absolute;
-      bottom: 10px;
-      left: 18px;
-      font-family: var(--font-pixel);
-      font-size: 7px;
-      color: var(--slate-grey);
-      letter-spacing: 0.1em;
-      opacity: 0.7;
-    }
-
-    /* ─── SCREEN ─── */
-    .tv-screen {
-      background: var(--ink-black);
-      border: 2px solid var(--slate-grey);
-      border-radius: 10px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: inset 0 0 30px rgba(19, 20, 26, 0.9), inset 0 0 8px rgba(127, 139, 178, 0.1);
-      padding: 40px 60px;
-      min-width: 320px;
-      min-height: 240px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .tv-screen::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 3;
-      background: repeating-linear-gradient(
-        0deg,
-        rgba(19, 20, 26, 0.3) 0px,
-        rgba(19, 20, 26, 0.3) 1px,
-        transparent 1px,
-        transparent 3px
-      );
-    }
-    .tv-screen::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 3;
-      box-shadow: inset 0 0 60px 20px rgba(19, 20, 26, 0.7);
-    }
-
-    /* ─── SCREEN CONTENT ─── */
-    .screen-content {
-      position: relative;
-      z-index: 4;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    .screen-content h1 {
+    .hero-title {
       font-family: var(--font-pixel);
-      font-size: 18px;
+      font-size: 42px;
       color: var(--lavender-grey);
-      letter-spacing: 0.14em;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      text-shadow: 0 0 10px rgba(127, 139, 178, 0.5);
-      line-height: 1.6;
-      margin: 0;
+      text-shadow: 0 0 15px rgba(127, 139, 178, 0.6), 0 0 30px rgba(127, 139, 178, 0.2);
+      line-height: 1.4;
+      margin: 0 0 8px 0;
     }
-    .screen-content .cursor {
-      color: var(--lavender-grey);
-      font-size: 20px;
+    .hero-cursor {
       font-family: var(--font-terminal);
+      font-size: 48px;
+      color: var(--lavender-grey);
+      text-shadow: 0 0 10px rgba(127, 139, 178, 0.8);
+      line-height: 1;
+      margin-bottom: 24px;
     }
 
-    /* ─── HERO SLOGAN & BUTTON ─── */
     .hero-slogan {
-      z-index: 2;
       font-family: var(--font-terminal);
-      font-size: 26px;
+      font-size: 28px;
       color: var(--slate-grey);
-      margin-top: 32px;
       letter-spacing: 0.06em;
       text-align: center;
+      margin-top: 16px;
+      margin-bottom: 40px;
     }
     .btn {
       display: inline-block;
       font-family: var(--font-pixel);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      padding: 16px 28px;
+      padding: 18px 32px;
       border: 2px solid var(--slate-grey);
       background: var(--ink-black);
       color: var(--lavender-grey);
@@ -409,7 +297,6 @@
       transition: background 0.15s steps(2, end), border-color 0.15s steps(2, end), transform 0.1s steps(2, end);
       box-shadow: 4px 4px 0 0 var(--space-indigo);
       z-index: 2;
-      margin-top: 24px;
       text-decoration: none;
       image-rendering: pixelated;
       border-radius: 0;
@@ -424,12 +311,14 @@
     }
 
     .scroll-hint {
+      position: absolute;
+      bottom: 24px;
       z-index: 2;
       font-family: var(--font-terminal);
       font-size: 28px;
       color: var(--lavender-grey);
-      margin-top: 40px;
       letter-spacing: 0.1em;
+      opacity: 0.7;
     }
 
     /* ─── SECTIONS ─── */
@@ -611,20 +500,15 @@
 
     /* ─── RESPONSIVE ─── */
     @media (max-width: 900px) {
-      .tv-frame {
-        padding: 12px 12px 32px 12px;
+      .hero-title {
+        font-size: 32px;
       }
-      .tv-screen {
-        padding: 28px 36px;
-        min-width: 260px;
-        min-height: 200px;
-      }
-      .screen-content h1 {
-        font-size: 14px;
+      .hero-cursor {
+        font-size: 36px;
       }
       .hero {
-        padding: 40px 16px 60px;
-        min-height: 80vh;
+        padding: 60px 16px;
+        min-height: 70vh;
       }
       .code-col {
         opacity: 0.04;
@@ -632,19 +516,15 @@
     }
 
     @media (max-width: 600px) {
-      .tv-frame {
-        padding: 8px 8px 28px 8px;
+      .hero-title {
+        font-size: 24px;
+        letter-spacing: 0.1em;
       }
-      .tv-screen {
-        padding: 20px 24px;
-        min-width: 220px;
-        min-height: 160px;
+      .hero-cursor {
+        font-size: 28px;
       }
-      .screen-content h1 {
-        font-size: 11px;
-      }
-      .screen-content .cursor {
-        font-size: 16px;
+      .hero-slogan {
+        font-size: 20px;
       }
       .nav-links {
         gap: 16px;
@@ -664,12 +544,9 @@
       .post-grid {
         grid-template-columns: 1fr;
       }
-      .hero-slogan {
-        font-size: 20px;
-      }
       .btn {
-        font-size: 9px;
-        padding: 12px 20px;
+        font-size: 10px;
+        padding: 14px 24px;
       }
       .about-sprite {
         width: 96px;
@@ -694,10 +571,6 @@
       }
       body::after {
         animation: none;
-      }
-      .tv-wrapper {
-        animation: none;
-        opacity: 1;
       }
     }
   </style>
@@ -743,23 +616,13 @@
       <div class="code-col">&gt; cursor blink<br>:: steps(2) infinite<br>:: block ▮</div>
     </div>
 
-    <div class="tv-wrapper">
-      <div class="tv-frame">
-        <div class="tv-screen">
-          <div class="screen-content">
-            <h1>RETRO::BLOG<br><span class="cursor blink">▮</span></h1>
-          </div>
-        </div>
-        <div class="tv-knobs" aria-hidden="true">
-          <div class="tv-knob"></div>
-          <div class="tv-knob"></div>
-        </div>
-        <div class="tv-brand-label">ARCH_SYNTH</div>
-      </div>
+    <div class="hero-content">
+      <h1 class="hero-title">RETRO::BLOG</h1>
+      <div class="hero-cursor blink">▮</div>
+      <p class="hero-slogan">// musings from a basement terminal //</p>
+      <a href="#posts" class="btn">READ POSTS</a>
     </div>
 
-    <p class="hero-slogan">// musings from a basement terminal //</p>
-    <a href="#posts" class="btn">READ POSTS</a>
     <p class="scroll-hint blink" aria-hidden="true">▼_</p>
   </section>
 
@@ -831,7 +694,7 @@
     <div style="position:relative; z-index:2;">
       <div class="divider" aria-hidden="true"></div>
       <p>© 2026 — assembled in a basement</p>
-      <p style="font-size:14px; opacity:0.6; margin-top:8px;">[ 5 colors : 2 fonts : no ascii ]</p>
+      <p style="font-size:14px; opacity:0.6; margin-top:8px;">[ 5 colors : 2 fonts : pure vibe ]</p>
     </div>
   </footer>
 
