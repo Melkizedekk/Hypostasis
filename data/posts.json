@@ -1,134 +1,31 @@
 {
   "settings": {
-    "title": "retro::blog",
-    "slogan": "// musings from a basement terminal //",
-    "aboutText": "I'm a systems tinkerer and pixel enthusiast. This blog is a love letter to the cold blue glow of CRT monitors, the smell of old electronics, and the joy of writing code that runs close to the metal. Expect posts about retro-computing, gamedev, and the occasional synthwave aesthetic experiment.",
-    "aboutSecondary": "// currently: exploring bare-metal Raspberry Pi graphics.",
+    "title": "her şey",
+    "slogan": "",
+    "aboutText": "",
+    "aboutSecondary": "",
     "aboutImage": "",
-    "footerText": "© 2026 — assembled in a basement",
-    "footerMeta": "[ 5 colors : 2 fonts : pure vibe ]",
+    "footerText": "",
+    "footerMeta": "",
     "accent": ""
   },
   "posts": [
     {
-      "id": "p-synthwave-css",
-      "slug": "building-a-synthwave-renderer-in-pure-css",
-      "title": "Building a Synthwave Renderer in Pure CSS",
-      "date": "2026-02-14",
-      "readTime": "8 min",
-      "excerpt": "Recreating the iconic sunset grid with repeating-linear-gradients and a single horizon line. No JavaScript, no canvas — just gradients and a lot of patience.",
+      "id": "d0df3d05-afd6-4c7c-9eeb-97d23e34f4eb",
+      "slug": "selam",
+      "title": "selam",
+      "date": "2026-11-09",
+      "readTime": "1 min",
+      "excerpt": "",
       "cover": "",
       "glyph": "▓▒░\n░▓▒\n▒░▓",
-      "tags": [
-        "css",
-        "synthwave",
-        "frontend"
-      ],
-      "content": "## The grid is just math\n\nEvery synthwave scene starts with a floor that recedes into infinity. In CSS you do not need a canvas for that — you need two `repeating-linear-gradient`s and a perspective trick that has been around since the dawn of the web.\n\nThe whole scene fits in three layers:\n\n1. a **sky** gradient (deep indigo to near-black)\n2. a **sun** made of one radial-gradient and a few horizontal slice masks\n3. a **floor grid** with `transform: perspective()` and a slow upward scroll\n\n```css\n.floor {\n  background-image:\n    repeating-linear-gradient(90deg, transparent 0 39px, #7f8bb2 39px 40px),\n    repeating-linear-gradient(0deg, transparent 0 39px, #7f8bb2 39px 40px);\n  transform: perspective(200px) rotateX(60deg);\n}\n```\n\n## Why bother\n\nThe constraints are the fun part. A renderer built from gradients weighs a few kilobytes, scales to any resolution, and degrades gracefully on machines that never had a GPU to begin with.\n\n> Nostalgia is a rendering technique.\n\nNext time I want to add palette cycling on top of this — a handful of CSS custom properties driven by a single `@keyframes` rule.",
-      "status": "published",
-      "featured": true,
-      "createdAt": "2026-02-14T10:00:00.000Z",
-      "updatedAt": "2026-02-14T10:00:00.000Z"
-    },
-    {
-      "id": "p-assembly-fun",
-      "slug": "why-i-still-write-assembly-for-fun",
-      "title": "Why I Still Write Assembly for Fun",
-      "date": "2026-01-30",
-      "readTime": "12 min",
-      "excerpt": "There's a meditative quality to hand-optimising a loop. This post walks through a tiny demoscene effect written in x86-64, from registers to pixels.",
-      "cover": "",
-      "glyph": "█▓█\n▓░▓\n█▓█",
-      "tags": [
-        "assembly",
-        "demoscene",
-        "low-level"
-      ],
-      "content": "## Registers are a kind of poetry\n\nModern compilers are better than me at almost everything. That is exactly why writing assembly by hand is still worth doing: not to beat the compiler, but to understand what it is doing.\n\nMy rule is simple — if a routine fits in a screen of text and touches the framebuffer, I will write it by hand at least once.\n\n## A tiny effect\n\nThe effect: a vertical wipe that writes a colour ramp directly into video memory.\n\n```asm\nloop:\n    mov  al, [rsi]\n    mov  [rdi], al\n    inc  rsi\n    add  rdi, 4\n    dec  rcx\n    jnz  loop\n```\n\nSix instructions. No branches except the loop itself. On a modern CPU this runs at memory speed and the frame budget disappears entirely.\n\nThe point is not speed. The point is that after writing this, you can *see* the machine.",
-      "status": "published",
+      "tags": [],
+      "content": "",
+      "status": "draft",
       "featured": false,
-      "createdAt": "2026-01-30T10:00:00.000Z",
-      "updatedAt": "2026-01-30T10:00:00.000Z"
-    },
-    {
-      "id": "p-crt-shaders",
-      "slug": "crt-shaders-for-the-web-a-love-letter",
-      "title": "CRT Shaders for the Web: A Love Letter",
-      "date": "2026-01-12",
-      "readTime": "6 min",
-      "excerpt": "Scanlines, phosphor glow, and a gentle flicker — how to fake the warmth of a real tube monitor in the browser without melting the GPU.",
-      "cover": "",
-      "glyph": "▒▓▒\n▓█▓\n▒▓▒",
-      "tags": [
-        "webgl",
-        "shaders",
-        "retro"
-      ],
-      "content": "## Faking a tube\n\nA real CRT is a physics problem. A convincing CSS/WebGL approximation is a *perception* problem, and perception is much cheaper.\n\nThree effects do most of the work:\n\n- **scanlines** — a repeating gradient, 1px on, 2px off\n- **bloom** — a blurred copy of the image added back on top\n- **barrel distortion** — a very slight `border-radius` illusion, or a real shader warp\n\n## The flicker\n\nThe hardest part is the flicker. Too little and it feels digital. Too much and it feels broken. A 6-second loop that drops opacity by 1.5% is enough.\n\n```css\n@keyframes flicker {\n  0%, 100% { opacity: 1; }\n  50%      { opacity: 0.985; }\n}\n```\n\nRespect `prefers-reduced-motion` and turn the whole thing off. Aesthetics should never make someone sick.",
-      "status": "published",
-      "featured": false,
-      "createdAt": "2026-01-12T10:00:00.000Z",
-      "updatedAt": "2026-01-12T10:00:00.000Z"
-    },
-    {
-      "id": "p-retroarch",
-      "slug": "retroarch-setup-for-pixel-perfect-gaming",
-      "title": "RetroArch Setup for Pixel-Perfect Gaming",
-      "date": "2025-12-20",
-      "readTime": "10 min",
-      "excerpt": "Integer scaling, shaders, and the right aspect ratio. A complete guide to making 240p games look exactly like they did on your childhood TV.",
-      "cover": "",
-      "glyph": "░█░\n█▓█\n░█░",
-      "tags": [
-        "retroarch",
-        "emulation",
-        "guide"
-      ],
-      "content": "## Start with integer scaling\n\nNon-integer scaling is the single biggest source of ugly pixels. Turn it on, accept the black bars, and never look back.\n\n## Shaders\n\n`crt-guest-advanced` is the current sweet spot between accuracy and performance. On a low-end machine, fall back to `crt-geom`.\n\n## The checklist\n\n- integer scale: **on**\n- aspect ratio: **core provided**\n- bilinear filtering: **off**\n- frame delay: **1–2**\n\nThat is the entire setup. Everything else is taste.",
-      "status": "published",
-      "featured": false,
-      "createdAt": "2025-12-20T10:00:00.000Z",
-      "updatedAt": "2025-12-20T10:00:00.000Z"
-    },
-    {
-      "id": "p-dithering",
-      "slug": "demoscene-tricks-dithering-and-palette-cycling",
-      "title": "Demoscene Tricks: Dithering and Palette Cycling",
-      "date": "2025-11-08",
-      "readTime": "7 min",
-      "excerpt": "Before shaders, we had ordered dithering and palette rotation. Revisiting the classic techniques that squeezed beauty out of 16 colors.",
-      "cover": "",
-      "glyph": "▓▓▓\n▒▒▒\n░░░",
-      "tags": [
-        "demoscene",
-        "graphics"
-      ],
-      "content": "## 16 colours is enough\n\nOrdered dithering is a magic trick: you trade spatial resolution for perceived colour depth, and the eye fills in the rest.\n\nA 4×4 Bayer matrix is enough to make a two-colour image look like it has a dozen shades.\n\n## Palette cycling\n\nInstead of animating pixels, rotate the palette. It costs almost nothing and it produced some of the most memorable effects of the 90s.\n\n```js\nconst cycle = palette.slice(1).concat(palette[0]);\n```\n\nTwo lines of code, one entire aesthetic movement.",
-      "status": "published",
-      "featured": false,
-      "createdAt": "2025-11-08T10:00:00.000Z",
-      "updatedAt": "2025-11-08T10:00:00.000Z"
-    },
-    {
-      "id": "p-terminal-blog",
-      "slug": "a-terminal-based-blog-engine-in-200-lines",
-      "title": "A Terminal-Based Blog Engine in 200 Lines",
-      "date": "2025-10-15",
-      "readTime": "9 min",
-      "excerpt": "Markdown to HTML via awk, a Makefile, and a pure-CGI script. The result is a fast, dependency-free blog that works in any text browser.",
-      "cover": "",
-      "glyph": "█▒█\n▓░▓\n█▒█",
-      "tags": [
-        "bash",
-        "markdown",
-        "cgi"
-      ],
-      "content": "## Constraints as a feature\n\nI wanted a blog I could update over SSH from a machine with no package manager. No Node, no Ruby, no build cache.\n\nThe answer was a 200-line CGI script, a `Makefile`, and a folder of `.md` files.\n\n## How it works\n\n1. `make` converts every Markdown file to HTML\n2. the CGI script reads a directory index\n3. the browser gets plain HTML\n\n## The result\n\nLoads in under 20ms on a Raspberry Pi. Works in `lynx`. Never needs an update. The only thing it cannot do is look cool, which is why this blog exists.",
-      "status": "published",
-      "featured": false,
-      "createdAt": "2025-10-15T10:00:00.000Z",
-      "updatedAt": "2025-10-15T10:00:00.000Z"
+      "createdAt": "2026-11-09T14:02:39.560Z",
+      "updatedAt": "2026-11-09T14:02:39.560Z"
     }
   ],
-  "updatedAt": "2026-11-09T13:53:51.896Z"
+  "updatedAt": "2026-11-09T14:02:39.561Z"
 }
