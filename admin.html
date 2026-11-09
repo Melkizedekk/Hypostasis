@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>retro::blog // admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/admin.css?v=1">
+</head>
+<body>
+
+  <!-- ═══════════ GİRİŞ ═══════════ -->
+  <div class="login-screen" id="loginScreen">
+    <form class="login-box" id="loginForm">
+      <div class="login-brand">retro::blog</div>
+      <p class="login-sub">// admin terminal v1.0</p>
+
+      <div class="notice" id="serverNotice" hidden>
+        <strong>Sunucuya ulaşılamıyor.</strong><br>
+        Paneli kullanmak için proje klasöründe <code>npm start</code> komutunu çalıştır ve
+        <code>http://localhost:3000/admin.html</code> adresini aç.
+      </div>
+
+      <label for="password">ŞİFRE</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" placeholder="••••••••" required>
+      <button type="submit" class="btn" id="loginBtn">GİRİŞ ▸</button>
+      <p class="error" id="loginError" hidden></p>
+      <p class="hint">
+        Şifre proje klasöründeki <code>.env</code> dosyasında:<br>
+        <code>ADMIN_PASSWORD=...</code>
+      </p>
+    </form>
+  </div>
+
+  <!-- ═══════════ PANEL ═══════════ -->
+  <div class="app" id="app" hidden>
+    <aside class="sidebar">
+      <div class="side-brand">retro::blog<span>admin</span></div>
+      <nav class="side-nav">
+        <button type="button" data-view="dashboard">▣ &nbsp;Panel</button>
+        <button type="button" data-view="posts">▤ &nbsp;Yazılar</button>
+        <button type="button" data-view="editor/new">+ &nbsp;Yeni Yazı</button>
+        <button type="button" data-view="media">▦ &nbsp;Medya</button>
+        <button type="button" data-view="settings">⚙ &nbsp;Ayarlar</button>
+        <button type="button" data-view="publish">⇧ &nbsp;Yayınla</button>
+      </nav>
+      <div class="side-foot">
+        <a href="/" target="_blank" rel="noopener">↗ Siteyi aç</a>
+        <button type="button" id="logoutBtn">⏻ Çıkış</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="main-head">
+        <h1 id="viewTitle">Panel</h1>
+        <div class="head-actions" id="headActions"></div>
+      </header>
+      <div id="view"></div>
+    </main>
+  </div>
+
+  <!-- ═══════════ MEDYA SEÇİCİ ═══════════ -->
+  <dialog class="media-dialog" id="mediaPicker">
+    <div class="dialog-head">
+      <h3>// medya kütüphanesi</h3>
+      <button type="button" class="dialog-close" id="pickerClose">KAPAT ✕</button>
+    </div>
+    <div class="dialog-body">
+      <div class="picker-grid" id="pickerGrid"></div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="assets/js/markdown.js"></script>
+  <script src="assets/js/admin.js"></script>
+</body>
+</html>

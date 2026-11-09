@@ -1,0 +1,15 @@
+# bağımlılıklar
+node_modules/
+
+# admin şifresi — asla GitHub'a gitmesin
+.env
+
+# otomatik yedek + geçici dosyalar
+data/posts.backup.json
+data/*.tmp
+*.log
+
+# işletim sistemi
+.DS_Store
+Thumbs.db
+desktop.ini
