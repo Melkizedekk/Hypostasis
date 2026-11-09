@@ -1,247 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminal UI</title>
-    <style>
-        /* Font ve Temel Ayarlar */
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&display=swap');
-
-        :root {
-            --bg-color: #0d0d0d;
-            --panel-bg: #151515;
-            --border-color: #333;
-            --text-main: #b0b0b0;
-            --text-dim: #666;
-            --accent: #4a90e2; /* Görseldeki mavi vurgu */
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            height: 100vh;
-            display: grid;
-            /* Ana Grid Yapısı: Sol, Orta, Sağ */
-            grid-template-columns: 250px 1fr 300px; 
-            grid-template-rows: 30px 1fr; /* Üst bar ve içerik */
-            gap: 10px;
-            padding: 10px;
-        }
-
-        /* Genel Kutu Stili */
-        .box {
-            background-color: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 10px;
-            overflow: hidden; /* Taşmaları gizle */
-        }
-
-        /* Üst Bar */
-        .top-bar {
-            grid-column: 1 / -1; /* Tüm genişliği kapla */
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: none;
-            background: transparent;
-            padding: 0 5px;
-            color: var(--text-dim);
-        }
-
-        /* Sol Panel (Müzik Listesi) */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .list-item {
-            padding: 5px 0;
-            border-bottom: 1px solid #222;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .list-item:hover {
-            color: white;
-            background: #222;
-        }
-        
-        /* Sağ Panel Dikey Bölünme */
-        .right-panel {
-            display: grid;
-            grid-template-rows: 1fr 1fr; /* İki eşit parça */
-            gap: 10px;
-        }
-
-        /* Kod Bloğu / Orta Alan */
-        .main-content {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(to bottom, #111, #000);
-        }
-
-        .code-block {
-            color: #a9b7c6;
-            font-size: 12px;
-            line-height: 1.5;
-            white-space: pre;
-        }
-
-        .code-keyword { color: #cc7832; }
-        .code-string { color: #6a8759; }
-        .code-func { color: #ffc66d; }
-
-        /* Sahte Sistem Monitörü */
-        .sys-monitor {
-            font-size: 11px;
-            color: #888;
-        }
-
-        /* Dosya Yöneticisi Izgarası */
-        .file-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .folder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 10px;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .folder:hover { color: var(--accent); }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #0d0d0d; }
-        ::-webkit-scrollbar-thumb { background: #333; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>retro-term // blog</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Monospace fonts: JetBrains Mono via Google Fonts, fallback to system monospace -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- Üst Bar -->
-    <div class="top-bar">
-        <div>[ CPU: 20% | RAM: 50% ]</div>
-        <div style="color: var(--accent);">overthinking</div>
-        <div>[ 17:15:59 ]</div>
+  <!-- Top bar (Polybar style) -->
+  <header class="top-bar">
+    <div class="top-left">
+      <span class="accent-cyan">[blog@retro]</span>
+      <span class="top-workspace">1:web</span>
+      <span class="top-workspace">2:term</span>
+      <span class="top-workspace active">3:posts</span>
     </div>
-
-    <!-- Sol Panel -->
-    <div class="box sidebar">
-        <div style="color:var(--text-dim); margin-bottom:10px;">LIBRARY > PLAYLIST</div>
-        <div class="list-item"><span>1. Audio 002</span> <span>1:07</span></div>
-        <div class="list-item"><span>2. (Something)</span> <span>2:38</span></div>
-        <div class="list-item"><span>3. The last goodbye</span> <span>5:58</span></div>
-        <div class="list-item"><span>4. Dolores (Reveries)</span> <span>4:19</span></div>
-        <div class="list-item"><span>5. In my feelings</span> <span>3:18</span></div>
-        <div class="list-item"><span>6. dead in veritas</span> <span>3:38</span></div>
-        <br>
-        <div style="color:var(--text-dim);">RECENTLY PLAYED</div>
-        <div style="margin-top:10px; display:flex; gap:10px;">
-            <div style="width:40px; height:40px; background:#333;"></div>
-            <div style="font-size:10px; line-height:1.2;">
-                <b>Nostalgia</b><br>
-                Artist Name
-            </div>
-        </div>
+    <div class="top-center">
+      <span class="accent-purple">blog.terminal</span>
     </div>
-
-    <!-- Orta Panel (Görseldeki kod editörü gibi) -->
-    <div class="box main-content">
-        <!-- Arkaplan Görseli Simülasyonu (Görseldeki orman) -->
-        <div style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0.2; background: url('https://images.unsplash.com/photo-1448375240586-dfd8d395ea6c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover;"></div>
-        
-        <div class="code-block" style="z-index: 1;">
-<span class="code-keyword">Rectangle</span> {
-    <span class="code-func">id</span>: border
-    z: <span class="code-string">18</span>
-    anchors.fill: parent
-
-    <span class="code-func">Text</span> {
-        id: border
-        anchors.centerIn: parent
-        text: <span class="code-string">"Hello World"</span>
-        color: <span class="code-string">"#ffffff"</span>
-    }
-}
-
-<span class="code-keyword">MouseArea</span> {
-    anchors.fill: parent
-    <span class="code-func">onEntered</span>: list.selectedIndex = index
-    <span class="code-func">onClicked</span>: list.activateCurrent()
-}
-        </div>
+    <div class="top-right">
+      <span class="cpu-stats">
+        <span class="accent-green">CPU</span>
+        <span class="cpu-bar-bg"><span class="cpu-bar-fill" id="cpu-fill"></span></span>
+        <span id="cpu-value">0%</span>
+      </span>
+      <span class="ram-stats">
+        <span class="accent-green">RAM</span>
+        <span class="ram-bar-bg"><span class="ram-bar-fill" id="ram-fill"></span></span>
+        <span id="ram-value">0%</span>
+      </span>
+      <span class="date-time" id="datetime"></span>
     </div>
+  </header>
 
-    <!-- Sağ Panel -->
-    <div class="right-panel">
-        <!-- Sağ Üst: Sistem Durumu -->
-        <div class="box sys-monitor">
-            <div style="border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:5px;">cpu_usage</div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
-                <span>CPU0 [|||| 40%]</span>
-                <span>CPU1 [|    10%]</span>
-                <span>RAM  [|||  35%]</span>
-                <span>SWAP [     0%]</span>
-            </div>
-            <br>
-            <div style="border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:5px;">process_filter</div>
-            <div>root 1024 0.5% /usr/bin/xorg</div>
-            <div>user 2048 1.2% /usr/bin/browser</div>
-            <div>user 3042 0.1% /bin/bash</div>
-        </div>
+  <!-- Main tiling area -->
+  <main class="tiling-grid">
 
-        <!-- Sağ Alt: Dosya Yöneticisi -->
-        <div class="box" style="position:relative;">
-            <div style="margin-bottom:10px; color:var(--text-dim);">~/home/user/Desktop</div>
-            <div class="file-grid">
-                <div class="folder">
-                    <div style="font-size:24px;">📁</div>
-                    <span>Documents</span>
-                </div>
-                <div class="folder">
-                    <div style="font-size:24px;">📁</div>
-                    <span>Downloads</span>
-                </div>
-                <div class="folder">
-                    <div style="font-size:24px;">📁</div>
-                    <span>Pictures</span>
-                </div>
-                <div class="folder">
-                    <div style="font-size:24px;">⚙️</div>
-                    <span>.config</span>
-                </div>
-                <div class="folder">
-                    <div style="font-size:24px;">📄</div>
-                    <span>notes.txt</span>
-                </div>
+    <!-- Left panel: About / neofetch style -->
+    <aside class="panel about-panel">
+      <div class="panel-header">
+        <span class="panel-title">~ about.me</span>
+        <span class="panel-close">×</span>
+      </div>
+      <div class="panel-content">
+        <div class="neofetch">
+          <div class="neofetch-logo">
+            <span class="ascii-art">
+        .---.
+       /     \
+      | () () |
+       \  ^  /
+        |||||
+        |||||
+            </span>
+          </div>
+          <div class="neofetch-info">
+            <div><span class="accent-cyan">user</span>@<span class="accent-cyan">retro</span></div>
+            <div>---------------</div>
+            <div><span class="accent-purple">OS</span>: Arch Linux x86_64</div>
+            <div><span class="accent-purple">Host</span>: Tiling WM Blog</div>
+            <div><span class="accent-purple">Kernel</span>: 6.8.1-arch1</div>
+            <div><span class="accent-purple">Uptime</span>: 4 days, 2 hours</div>
+            <div><span class="accent-purple">Shell</span>: zsh 5.9</div>
+            <div><span class="accent-purple">Terminal</span>: alacritty</div>
+            <div><span class="accent-purple">WM</span>: bspwm</div>
+            <div><span class="accent-purple">Theme</span>: Tokyo Night</div>
+            <div><span class="accent-purple">Font</span>: JetBrains Mono</div>
+            <div class="neofetch-colors">
+              <span class="block" style="background:#1a1b26;"></span>
+              <span class="block" style="background:#c0caf5;"></span>
+              <span class="block" style="background:#7dcfff;"></span>
+              <span class="block" style="background:#bb9af7;"></span>
+              <span class="block" style="background:#9ece6a;"></span>
+              <span class="block" style="background:#f7768e;"></span>
             </div>
-            <!-- Alt bar -->
-            <div style="position:absolute; bottom:0; left:0; width:100%; background:#222; padding:2px 5px; font-size:10px; display:flex; justify-content:space-between;">
-                <span>1/20 files</span>
-                <span>1.2 GB free</span>
-            </div>
+          </div>
         </div>
+      </div>
+    </aside>
+
+    <!-- Right panel: Main blog posts (terminal style) -->
+    <section class="panel posts-panel">
+      <div class="panel-header">
+        <span class="panel-title">[ user@blog ~ ] $ _</span>
+        <span class="panel-close">×</span>
+      </div>
+      <div class="panel-content posts-content">
+        <div class="terminal-header">
+          <span class="accent-cyan">ls -la /var/blog/posts/</span>
+          <span class="blinking-cursor">█</span>
+        </div>
+        <div class="post-list" id="post-list">
+          <!-- Posts will be injected by JS -->
+        </div>
+        <div class="terminal-footer">
+          <span class="accent-green">total</span> <span id="post-count">0</span> posts
+          <span class="accent-purple">|</span> <span id="current-date"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom panel: Tags / file manager style -->
+    <aside class="panel tags-panel">
+      <div class="panel-header">
+        <span class="panel-title">~ tags</span>
+        <span class="panel-close">×</span>
+      </div>
+      <div class="panel-content">
+        <div class="tags-list">
+          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">linux</span> <span class="tag-count">(12)</span></div>
+          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">css</span> <span class="tag-count">(8)</span></div>
+          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">javascript</span> <span class="tag-count">(15)</span></div>
+          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">terminal</span> <span class="tag-count">(5)</span></div>
+          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">design</span> <span class="tag-count">(7)</span></div>
+          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">productivity</span> <span class="tag-count">(3)</span></div>
+          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">arch</span> <span class="tag-count">(9)</span></div>
+          <div class="tag-item"><span class="tag-icon">📁</span> <span class="accent-cyan">dotfiles</span> <span class="tag-count">(4)</span></div>
+        </div>
+        <div class="tags-footer">
+          <span class="accent-purple">/</span> <span class="accent-green">total tags:</span> 8
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- Fake terminal command line at the bottom -->
+  <div class="terminal-input-bar">
+    <span class="prompt">[user@blog ~]$</span>
+    <input type="text" id="terminal-input" class="terminal-input" placeholder="type 'help' for commands..." autocomplete="off" spellcheck="false">
+    <span class="blinking-cursor-static">█</span>
+  </div>
+
+  <!-- Modal overlay for post reading -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-window">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-title">post.md</span>
+        <span class="modal-close" id="modal-close">×</span>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- Post content injected here -->
+      </div>
+      <div class="modal-footer">
+        <span class="accent-purple">--</span> <span id="modal-footer-text">press ESC to close</span> <span class="accent-purple">--</span>
+      </div>
     </div>
+  </div>
 
+  <script src="script.js"></script>
 </body>
 </html>
