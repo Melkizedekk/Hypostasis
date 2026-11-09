@@ -1,18 +1,407 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hypostasis</title>
-  <meta name="robots" content="noindex, nofollow">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hypostasis Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            grid-template-rows: 1fr 400px;
+            gap: 15px;
+            padding: 15px;
+            height: 100vh;
+        }
+
+        /* Sol Panel - Music Player */
+        .music-player {
+            grid-row: 1 / -1;
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .music-player h2 {
+            margin-bottom: 20px;
+            color: #1db954;
+            font-size: 1.5rem;
+        }
+
+        .playlist {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .track {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .track:hover, .track.active {
+            background: rgba(29, 185, 84, 0.2);
+            transform: translateX(5px);
+        }
+
+        .track-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .track-artist {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .control-btn.play {
+            width: 60px;
+            height: 60px;
+            background: #1db954;
+        }
+
+        /* Sağ Üst - Sistem İzleme */
+        .system-monitor {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: auto;
+        }
+
+        .system-monitor h2 {
+            margin-bottom: 20px;
+            color: #00d4ff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #00d4ff;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* Sağ Alt - Dosya Yöneticisi */
+        .file-manager {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: auto;
+        }
+
+        .file-manager h2 {
+            margin-bottom: 20px;
+            color: #ff6b6b;
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .file-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-item:hover {
+            background: rgba(255, 107, 107, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .file-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .file-name {
+            font-size: 0.85rem;
+            word-break: break-word;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            
+            .music-player {
+                grid-row: auto;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Hypostasis</h1>
-  <p>Kişisel bloguma hoş geldin.</p>
-  
-  <h2>Yazılar</h2>
-  <ul>
-    <li><a href="posts/ilk-yazi.html">İlk Yazım</a></li>
-  </ul>
+    <div class="dashboard">
+        <!-- Sol Panel - Music Player -->
+        <div class="music-player">
+            <h2>🎵 Music Player</h2>
+            <div class="playlist" id="playlist">
+                <div class="track active">
+                    <div class="track-title">Midnight City</div>
+                    <div class="track-artist">M83</div>
+                </div>
+                <div class="track">
+                    <div class="track-title">Starboy</div>
+                    <div class="track-artist">The Weeknd</div>
+                </div>
+                <div class="track">
+                    <div class="track-title">Blinding Lights</div>
+                    <div class="track-artist">The Weeknd</div>
+                </div>
+                <div class="track">
+                    <div class="track-title">Nightcall</div>
+                    <div class="track-artist">Kavinsky</div>
+                </div>
+            </div>
+            <div class="player-controls">
+                <button class="control-btn">⏮</button>
+                <button class="control-btn play">▶</button>
+                <button class="control-btn">⏭</button>
+            </div>
+        </div>
+
+        <!-- Sağ Üst - Sistem İzleme -->
+        <div class="system-monitor">
+            <h2> Sistem Durumu</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">CPU Kullanımı</div>
+                    <div class="stat-value" id="cpu-value">45%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="cpu-bar" style="width: 45%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">RAM Kullanımı</div>
+                    <div class="stat-value" id="ram-value">62%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="ram-bar" style="width: 62%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">GPU Kullanımı</div>
+                    <div class="stat-value" id="gpu-value">38%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="gpu-bar" style="width: 38%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Disk Kullanımı</div>
+                    <div class="stat-value" id="disk-value">71%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="disk-bar" style="width: 71%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Network (Down)</div>
+                    <div class="stat-value" id="network-down">2.4 MB/s</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Network (Up)</div>
+                    <div class="stat-value" id="network-up">856 KB/s</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağ Alt - Dosya Yöneticisi -->
+        <div class="file-manager">
+            <h2>📁 Cloud Drive</h2>
+            <div class="file-grid" id="file-grid">
+                <div class="file-item">
+                    <div class="file-icon">📂</div>
+                    <div class="file-name">Documents</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">📂</div>
+                    <div class="file-name">Pictures</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon"></div>
+                    <div class="file-name">Music</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">📂</div>
+                    <div class="file-name">Videos</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">📄</div>
+                    <div class="file-name">report.pdf</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">️</div>
+                    <div class="file-name">photo.jpg</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">🎵</div>
+                    <div class="file-name">song.mp3</div>
+                </div>
+                <div class="file-item">
+                    <div class="file-icon">⚙️</div>
+                    <div class="file-name">config.json</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gerçek zamanlı sistem istatistikleri simülasyonu
+        function updateStats() {
+            const cpu = Math.floor(Math.random() * 60) + 20;
+            const ram = Math.floor(Math.random() * 40) + 40;
+            const gpu = Math.floor(Math.random() * 50) + 20;
+            
+            document.getElementById('cpu-value').textContent = cpu + '%';
+            document.getElementById('cpu-bar').style.width = cpu + '%';
+            
+            document.getElementById('ram-value').textContent = ram + '%';
+            document.getElementById('ram-bar').style.width = ram + '%';
+            
+            document.getElementById('gpu-value').textContent = gpu + '%';
+            document.getElementById('gpu-bar').style.width = gpu + '%';
+        }
+
+        // Her 3 saniyede bir güncelle
+        setInterval(updateStats, 3000);
+
+        // Müzik çalar kontrolleri
+        const tracks = document.querySelectorAll('.track');
+        const playBtn = document.querySelector('.control-btn.play');
+        let isPlaying = false;
+
+        tracks.forEach(track => {
+            track.addEventListener('click', function() {
+                tracks.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        playBtn.addEventListener('click', function() {
+            isPlaying = !isPlaying;
+            this.textContent = isPlaying ? '⏸' : '▶';
+        });
+
+        // Dosya yöneticisi etkileşimi
+        const fileItems = document.querySelectorAll('.file-item');
+        fileItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const fileName = this.querySelector('.file-name').textContent;
+                console.log('Açılan dosya/klasör:', fileName);
+                // Burada dosya açma/dizin gezme mantığı eklenebilir
+            });
+        });
+
+        // İlk yükleme
+        updateStats();
+    </script>
 </body>
 </html>
