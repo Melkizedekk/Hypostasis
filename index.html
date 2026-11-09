@@ -332,8 +332,12 @@
       position: relative;
       overflow: hidden;
       box-shadow: inset 0 0 30px rgba(19, 20, 26, 0.9), inset 0 0 8px rgba(127, 139, 178, 0.1);
-      padding: 12px;
-      min-width: 280px;
+      padding: 40px 60px;
+      min-width: 320px;
+      min-height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .tv-screen::before {
       content: '';
@@ -358,64 +362,26 @@
       box-shadow: inset 0 0 60px 20px rgba(19, 20, 26, 0.7);
     }
 
-    /* ─── ASCII ART ─── */
-    .ascii-container {
+    /* ─── SCREEN CONTENT ─── */
+    .screen-content {
       position: relative;
-      z-index: 2;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      max-width: 100%;
-    }
-    pre.ascii-art {
-      font-family: var(--font-terminal);
-      font-size: 10px;
-      line-height: 0.55em;
-      letter-spacing: 0.02em;
-      white-space: pre;
-      color: var(--lavender-grey);
-      text-shadow: 0 0 6px rgba(127, 139, 178, 0.25);
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      animation: ascii-flicker 4s ease-in-out infinite;
-      max-width: 100%;
-      overflow: hidden;
-      position: relative;
-      z-index: 1;
-    }
-    @keyframes ascii-flicker {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.92; }
-    }
-    pre.ascii-art .slate { color: var(--slate-grey); }
-    pre.ascii-art .lavender { color: var(--lavender-grey); }
-
-    /* hero title overlay inside oval */
-    .ascii-inner-title {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 5;
+      z-index: 4;
       text-align: center;
-      pointer-events: none;
-      width: 90%;
     }
-    .ascii-inner-title h1 {
+    .screen-content h1 {
       font-family: var(--font-pixel);
-      font-size: 14px;
+      font-size: 18px;
       color: var(--lavender-grey);
-      letter-spacing: 0.12em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       text-shadow: 0 0 10px rgba(127, 139, 178, 0.5);
       line-height: 1.6;
       margin: 0;
     }
-    .ascii-inner-title .cursor {
+    .screen-content .cursor {
       color: var(--lavender-grey);
-      font-size: 16px;
+      font-size: 20px;
+      font-family: var(--font-terminal);
     }
 
     /* ─── HERO SLOGAN & BUTTON ─── */
@@ -645,15 +611,16 @@
 
     /* ─── RESPONSIVE ─── */
     @media (max-width: 900px) {
-      pre.ascii-art {
-        font-size: 7px;
-        line-height: 0.55em;
-      }
       .tv-frame {
         padding: 12px 12px 32px 12px;
       }
-      .ascii-inner-title h1 {
-        font-size: 10px;
+      .tv-screen {
+        padding: 28px 36px;
+        min-width: 260px;
+        min-height: 200px;
+      }
+      .screen-content h1 {
+        font-size: 14px;
       }
       .hero {
         padding: 40px 16px 60px;
@@ -665,15 +632,19 @@
     }
 
     @media (max-width: 600px) {
-      pre.ascii-art {
-        font-size: 5px;
-        line-height: 0.55em;
-      }
-      .ascii-inner-title h1 {
-        font-size: 8px;
-      }
       .tv-frame {
         padding: 8px 8px 28px 8px;
+      }
+      .tv-screen {
+        padding: 20px 24px;
+        min-width: 220px;
+        min-height: 160px;
+      }
+      .screen-content h1 {
+        font-size: 11px;
+      }
+      .screen-content .cursor {
+        font-size: 16px;
       }
       .nav-links {
         gap: 16px;
@@ -724,7 +695,7 @@
       body::after {
         animation: none;
       }
-      .tv-wrapper, pre.ascii-art {
+      .tv-wrapper {
         animation: none;
         opacity: 1;
       }
@@ -775,11 +746,8 @@
     <div class="tv-wrapper">
       <div class="tv-frame">
         <div class="tv-screen">
-          <div class="ascii-container">
-            <pre class="ascii-art" id="asciiArt" aria-label="ASCII art centerpiece"></pre>
-            <div class="ascii-inner-title">
-              <h1>RETRO::BLOG<br><span class="cursor blink">▮</span></h1>
-            </div>
+          <div class="screen-content">
+            <h1>RETRO::BLOG<br><span class="cursor blink">▮</span></h1>
           </div>
         </div>
         <div class="tv-knobs" aria-hidden="true">
@@ -863,68 +831,13 @@
     <div style="position:relative; z-index:2;">
       <div class="divider" aria-hidden="true"></div>
       <p>© 2026 — assembled in a basement</p>
-      <p style="font-size:14px; opacity:0.6; margin-top:8px;">[ 5 colors : 2 fonts : 1 ascii centerpiece ]</p>
+      <p style="font-size:14px; opacity:0.6; margin-top:8px;">[ 5 colors : 2 fonts : no ascii ]</p>
     </div>
   </footer>
 
   <script>
     (function() {
       'use strict';
-
-      // ─── 0. ASCII ART (exact block from the new file) ───
-      const asciiBlock = `████████████████████████████████████████████████████████████████████████████████████████████
-█████████████████████████████████████████████ ████████████████████████████████████████████
-████████████████████████████████████████████░ ▓███████████████████████████████████████████
-▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓██▓   █▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓█
-███████████████████████████████████████████    ░██████████████████████████████████████████
-██████████████████████████████████████████░  ▒  ░█████████████████████████████████████████
-██████████████████████████████████████████  ██▓  ▓████████████████████████████████████████
-▓███▓███▓███▓███▓███▓███▓███▓███▓███▓████  ▒███░ ░██▓███▓███▓███▓███▓███▓███▓███▓███▓███▓█
-████████████████████████████████████████▓ ░█████  ▓███████████████████████████████████████
-███████████████████████████████████████▒  ▓█████▓  ▒██████████████████████████████████████
-███████████████████████████████████████  ░███████   ██████████████████████████████████████
-▓███▓███▓███▓███▓███▓███▓███▓███▓███▓█░  ███▓███▓█   ███▓███▓███▓███▓███▓███▓███▓███▓███▓█
-█████████████████████████████████████▓  ██████████▒  ▓████████████████████████████████████
-█████████████████████████████████████   ███████████   ████████████████████████████████████
-████████████████████████████████████  █████████████▓  ▒███████████████████████████████████
-▓████▓                           ▒▓█████▓███▓███▓███░                                ███▓█
-█████████                   ░▒███████████████████████████████████▓▓▓▓▒▒░▒░░░      ▒███████
-██████████▓▒           ░▓█████████████████████████████████████████████████▒    ▓██████████
-██████████████▒   ░▓█████████████████▒               ▓█████████████████▓    ▒█████████████
-▓███▓███▓███▓███████▓█████▒█████▓████▓               ▓██▓███▓███▓████░   ░██████▓███▓███▓█
-█████████████████████▓▒      ░█████████████▓   ███████████████████▓    ▓██████████████████
-██████████████████████        ░████████████▓   █████████████████   ░░█████████████████████
-█████████████████████████ █████████████████▒   ▓█████████████    ▓████████████████████████
-▓███▓███▓███▓███▓███▓███▓███▓██▓▒███▓██████▓   ▓████████▓█▒   ▒█████▓███▓███▓███▓███▓███▓█
-█████████████████████████████▓  ▒████▓               ▓████▒  █████████████████████████████
-█████████████████████████████  ░█████▒               ▓█████  ░████████████████████████████
-████████████████████████████▒  ▓███████████████████████████▓  ▒███████████████████████████
-▓███▓███▓███▓███▓███▓███▓███  ░█▓███▓███▓███████▓███▓███▓███   █▓███▓███▓███▓███▓███▓███▓█
-███████████████████████████░  ██████████████▓░▓██████████████  ░██████████████████████████
-██████████████████████████░  █████████████       ████████████▓  ▓█████████████████████████
-█████████████████████████▒  ██████████▓    ████▓    ▓█████████▒  ▓████████████████████████
-▓███▓███▓███▓███▓███▓███▓  ░████▓██▓   ░▓███▓█████▒    ▓████▓██░ ░██▓███▓███▓███▓███▓███▓█
-████████████████████████▓  ██████    ████████████████░   ░██████  ▒███████████████████████
-███████████████████████▓  ▒███    ▒█████████████████████▒   ░███░  ███████████████████████
-███████████████████████   █    ▒███████████████████████████     █░  ██████████████████████
-▓███▓███▓███▓███▓███▓█░     ░███▓███▓███▓███▓███▓███▓███▓█████       ███▓███▓███▓███▓███▓█
-██████████████████████   ▒███████████████████████████████████████░   ▓████████████████████
-████████████████████▓ ░████████████████████████████████████████████▓  ████████████████████
-██████████████████████████████████████████████████████████████████████████████████████████`;
-
-      const pre = document.getElementById('asciiArt');
-      let html = '';
-      for (let i = 0; i < asciiBlock.length; i++) {
-        const ch = asciiBlock[i];
-        if (ch === '░' || ch === '▒') {
-          html += '<span class="slate">' + ch + '</span>';
-        } else if (ch === '█' || ch === '▓') {
-          html += '<span class="lavender">' + ch + '</span>';
-        } else {
-          html += ch;
-        }
-      }
-      pre.innerHTML = html;
 
       // ─── 1. POPULATE POSTS ───
       const posts = [
