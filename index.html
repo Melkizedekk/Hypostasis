@@ -1,272 +1,1178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>~/blog — Retro Terminal</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>retro::blog // ARCH_SYNTH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    /* ─── PALETTE (5 colors ONLY) ─── */
+    :root {
+      --ink-black: #13141A;
+      --shadow-grey: #171820;
+      --space-indigo: #1F2335;
+      --slate-grey: #707386;
+      --lavender-grey: #7F8BB2;
+      --font-pixel: 'Press Start 2P', monospace;
+      --font-terminal: 'VT323', monospace;
+    }
+
+    /* ─── RESET & BASE ─── */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      background: var(--ink-black);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--ink-black);
+      color: var(--slate-grey);
+      font-family: var(--font-terminal);
+      font-size: 22px;
+      line-height: 1.5;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      font-smooth: never;
+      -webkit-font-smoothing: none;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ─── GLOBAL CRT OVERLAY ─── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(19, 20, 26, 0.25) 0px,
+        rgba(19, 20, 26, 0.25) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      animation: global-flicker 6s ease-in-out infinite;
+    }
+
+    @keyframes global-flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.985; }
+    }
+
+    ::selection {
+      background: rgba(127, 139, 178, 0.35);
+      color: var(--lavender-grey);
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--slate-grey);
+      outline-offset: 2px;
+    }
+
+    a {
+      color: var(--lavender-grey);
+      text-decoration: none;
+    }
+
+    /* ─── UTILITY ─── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .blink {
+      animation: blink-cursor 1s steps(2, start) infinite;
+    }
+
+    @keyframes blink-cursor {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* ─── SCROLL REVEAL ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.5s steps(4, end), transform 0.5s steps(4, end);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── TOP BAR ─── */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(19, 20, 26, 0.92);
+      border-bottom: 1px solid var(--slate-grey);
+      transition: border-color 0.2s steps(3, end);
+      backdrop-filter: blur(2px);
+    }
+    .top-bar.scrolled {
+      border-bottom-color: var(--lavender-grey);
+    }
+    .top-bar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-pixel);
+      font-size: 12px;
+      color: var(--lavender-grey);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .penguin-sprite {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      image-rendering: pixelated;
+      flex-shrink: 0;
+    }
+    .penguin-sprite span {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--font-terminal);
+      font-size: 24px;
+      color: var(--slate-grey);
+      letter-spacing: 0.04em;
+      position: relative;
+      transition: color 0.15s steps(3, end);
+    }
+    .nav-links a::before {
+      content: '>_';
+      position: absolute;
+      left: -28px;
+      opacity: 0;
+      color: var(--lavender-grey);
+      transition: opacity 0.15s steps(2, end);
+    }
+    .nav-links a:hover {
+      color: var(--lavender-grey);
+    }
+    .nav-links a:hover::before {
+      opacity: 1;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      background: var(--space-indigo);
+      overflow: hidden;
+      padding: 60px 24px 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 90vh;
+      justify-content: center;
+      /* perspective grid */
+      background-image:
+        repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(112, 115, 134, 0.12) 59px, rgba(112, 115, 134, 0.12) 60px),
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(112, 115, 134, 0.08) 39px, rgba(112, 115, 134, 0.08) 40px),
+        linear-gradient(180deg, var(--ink-black) 0%, var(--space-indigo) 40%, var(--space-indigo) 100%);
+      background-size: 60px 60px, 60px 60px, 100% 100%;
+    }
+    /* horizon sunset line */
+    .hero::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: var(--lavender-grey);
+      box-shadow: 0 0 12px 2px rgba(127, 139, 178, 0.45);
+      z-index: 0;
+    }
+
+    /* falling code columns */
+    .code-columns {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .code-col {
+      position: absolute;
+      top: -100%;
+      font-family: var(--font-terminal);
+      font-size: 18px;
+      line-height: 1.3;
+      color: var(--lavender-grey);
+      opacity: 0.1;
+      white-space: nowrap;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      animation: fall linear infinite;
+    }
+    .code-col:nth-child(1) { left: 5%; animation-duration: 32s; animation-delay: 0s; }
+    .code-col:nth-child(2) { left: 18%; animation-duration: 28s; animation-delay: -8s; color: var(--slate-grey); opacity: 0.08; }
+    .code-col:nth-child(3) { left: 32%; animation-duration: 36s; animation-delay: -14s; opacity: 0.12; }
+    .code-col:nth-child(4) { left: 48%; animation-duration: 30s; animation-delay: -4s; color: var(--slate-grey); opacity: 0.07; }
+    .code-col:nth-child(5) { left: 62%; animation-duration: 40s; animation-delay: -20s; opacity: 0.1; }
+    .code-col:nth-child(6) { left: 78%; animation-duration: 26s; animation-delay: -12s; color: var(--slate-grey); opacity: 0.09; }
+    .code-col:nth-child(7) { left: 91%; animation-duration: 34s; animation-delay: -6s; opacity: 0.11; }
+
+    @keyframes fall {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(200%); }
+    }
+
+    /* ─── CRT TV FRAME ─── */
+    .tv-wrapper {
+      position: relative;
+      z-index: 2;
+      perspective: 1200px;
+      animation: tv-flicker 4s ease-in-out infinite;
+    }
+    @keyframes tv-flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.92; }
+    }
+
+    .tv-frame {
+      background: var(--space-indigo);
+      border: 3px solid var(--slate-grey);
+      border-radius: 16px;
+      padding: 18px 18px 38px 18px;
+      box-shadow:
+        0 0 0 2px var(--shadow-grey),
+        0 12px 0 0 var(--shadow-grey),
+        0 0 40px 8px rgba(127, 139, 178, 0.08);
+      position: relative;
+      display: inline-block;
+      transform: rotateX(1deg) rotateY(-1deg);
+    }
+    /* vent grille right side */
+    .tv-frame::after {
+      content: '';
+      position: absolute;
+      right: -2px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 60px;
+      background: repeating-linear-gradient(
+        0deg,
+        var(--slate-grey) 0px,
+        var(--slate-grey) 2px,
+        transparent 2px,
+        transparent 5px
+      );
+      border-radius: 0 2px 2px 0;
+      opacity: 0.6;
+    }
+    /* knobs */
+    .tv-knobs {
+      position: absolute;
+      bottom: 8px;
+      right: 18px;
+      display: flex;
+      gap: 8px;
+    }
+    .tv-knob {
+      width: 14px;
+      height: 14px;
+      background: var(--slate-grey);
+      border: 2px solid var(--shadow-grey);
+      border-radius: 50%;
+      position: relative;
+    }
+    .tv-knob::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 5px;
+      background: var(--ink-black);
+    }
+    .tv-brand-label {
+      position: absolute;
+      bottom: 10px;
+      left: 18px;
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--slate-grey);
+      letter-spacing: 0.1em;
+      opacity: 0.7;
+    }
+
+    /* ─── SCREEN ─── */
+    .tv-screen {
+      background: var(--ink-black);
+      border: 2px solid var(--slate-grey);
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 30px rgba(19, 20, 26, 0.9), inset 0 0 8px rgba(127, 139, 178, 0.1);
+      padding: 12px;
+      min-width: 280px;
+    }
+    /* scanlines on screen */
+    .tv-screen::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(19, 20, 26, 0.3) 0px,
+        rgba(19, 20, 26, 0.3) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+    }
+    /* vignette */
+    .tv-screen::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      box-shadow: inset 0 0 60px 20px rgba(19, 20, 26, 0.7);
+    }
+
+    /* ─── ASCII ART ─── */
+    .ascii-container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      max-width: 100%;
+    }
+    pre.ascii-art {
+      font-family: var(--font-terminal);
+      font-size: 10px;
+      line-height: 0.55em;
+      letter-spacing: 0.02em;
+      white-space: pre;
+      color: var(--lavender-grey);
+      text-shadow: 0 0 6px rgba(127, 139, 178, 0.25);
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      animation: ascii-flicker 4s ease-in-out infinite;
+      max-width: 100%;
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+    @keyframes ascii-flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.92; }
+    }
+    /* override colors for ░▒ characters using spans */
+    pre.ascii-art .slate { color: var(--slate-grey); }
+    pre.ascii-art .lavender { color: var(--lavender-grey); }
+
+    /* hero title overlay inside oval */
+    .ascii-inner-title {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 5;
+      text-align: center;
+      pointer-events: none;
+      width: 90%;
+    }
+    .ascii-inner-title h1 {
+      font-family: var(--font-pixel);
+      font-size: 14px;
+      color: var(--lavender-grey);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px rgba(127, 139, 178, 0.5);
+      line-height: 1.6;
+      margin: 0;
+    }
+    .ascii-inner-title .cursor {
+      color: var(--lavender-grey);
+      font-size: 16px;
+    }
+
+    /* ─── HERO SLOGAN & BUTTON ─── */
+    .hero-slogan {
+      z-index: 2;
+      font-family: var(--font-terminal);
+      font-size: 26px;
+      color: var(--slate-grey);
+      margin-top: 32px;
+      letter-spacing: 0.06em;
+      text-align: center;
+    }
+    .btn {
+      display: inline-block;
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 16px 28px;
+      border: 2px solid var(--slate-grey);
+      background: var(--ink-black);
+      color: var(--lavender-grey);
+      cursor: pointer;
+      position: relative;
+      transition: background 0.15s steps(2, end), border-color 0.15s steps(2, end), transform 0.1s steps(2, end);
+      box-shadow: 4px 4px 0 0 var(--space-indigo);
+      z-index: 2;
+      margin-top: 24px;
+      text-decoration: none;
+      image-rendering: pixelated;
+      border-radius: 0;
+    }
+    .btn:hover {
+      background: var(--space-indigo);
+      border-color: var(--lavender-grey);
+    }
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 3px 3px 0 0 var(--space-indigo);
+    }
+
+    .scroll-hint {
+      z-index: 2;
+      font-family: var(--font-terminal);
+      font-size: 28px;
+      color: var(--lavender-grey);
+      margin-top: 40px;
+      letter-spacing: 0.1em;
+    }
+
+    /* ─── SECTIONS ─── */
+    .section {
+      padding: 70px 24px;
+    }
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-header {
+      font-family: var(--font-terminal);
+      font-size: 28px;
+      color: var(--lavender-grey);
+      letter-spacing: 0.06em;
+      margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .section-header .cursor {
+      color: var(--lavender-grey);
+    }
+
+    /* ─── POST GRID ─── */
+    .post-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 28px;
+    }
+    .post-card {
+      background: var(--shadow-grey);
+      border: 1px solid var(--slate-grey);
+      box-shadow: 2px 2px 0 0 var(--space-indigo);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.15s steps(2, end), box-shadow 0.15s steps(2, end);
+      position: relative;
+    }
+    .post-card:hover {
+      border-color: var(--lavender-grey);
+      box-shadow: 3px 3px 0 0 var(--space-indigo);
+    }
+    .post-thumb {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--space-indigo);
+      border: 1px solid var(--slate-grey);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      image-rendering: pixelated;
+    }
+    .post-thumb .pixel-glyph {
+      font-family: var(--font-terminal);
+      font-size: 12px;
+      color: var(--slate-grey);
+      text-align: center;
+      line-height: 1.2;
+      white-space: pre;
+      opacity: 0.7;
+      letter-spacing: 0.08em;
+    }
+    .post-card h3 {
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      color: var(--lavender-grey);
+      letter-spacing: 0.06em;
+      line-height: 1.5;
+      text-transform: uppercase;
+    }
+    .post-meta {
+      display: flex;
+      gap: 16px;
+      font-family: var(--font-terminal);
+      font-size: 18px;
+      color: var(--slate-grey);
+      letter-spacing: 0.04em;
+    }
+    .post-excerpt {
+      font-family: var(--font-terminal);
+      font-size: 20px;
+      color: var(--slate-grey);
+      line-height: 1.4;
+      flex-grow: 1;
+    }
+    .post-read-link {
+      font-family: var(--font-terminal);
+      font-size: 22px;
+      color: var(--lavender-grey);
+      align-self: flex-start;
+      letter-spacing: 0.06em;
+      transition: color 0.1s steps(2, end);
+      border-bottom: 1px solid transparent;
+      padding-bottom: 1px;
+    }
+    .post-read-link:hover {
+      border-bottom-color: var(--lavender-grey);
+    }
+
+    /* ─── SINGLE POST / ARTICLE (for completeness, hidden by default) ─── */
+    .article-view {
+      max-width: 70ch;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+    .article-view h2 {
+      font-family: var(--font-pixel);
+      font-size: 14px;
+      color: var(--lavender-grey);
+      letter-spacing: 0.08em;
+      margin: 32px 0 16px;
+      text-transform: uppercase;
+    }
+    .article-view h2::before {
+      content: '## ';
+      color: var(--slate-grey);
+    }
+    .article-view p {
+      font-family: var(--font-terminal);
+      font-size: 22px;
+      color: var(--slate-grey);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .article-view blockquote {
+      border-left: 4px solid var(--lavender-grey);
+      background: var(--shadow-grey);
+      padding: 16px 20px;
+      margin: 24px 0;
+      font-family: var(--font-terminal);
+      font-size: 22px;
+      color: var(--slate-grey);
+    }
+    .code-block {
+      background: var(--shadow-grey);
+      border: 1px solid var(--slate-grey);
+      margin: 24px 0;
+      position: relative;
+    }
+    .code-tab {
+      display: inline-block;
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      color: var(--lavender-grey);
+      background: var(--space-indigo);
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--slate-grey);
+      border-right: 1px solid var(--slate-grey);
+      letter-spacing: 0.06em;
+    }
+    .code-block pre {
+      font-family: var(--font-terminal);
+      font-size: 20px;
+      color: var(--lavender-grey);
+      padding: 16px;
+      overflow-x: auto;
+      line-height: 1.4;
+    }
+
+    /* ─── ARCHIVE / ABOUT / FOOTER ─── */
+    .archive-year {
+      margin-bottom: 32px;
+    }
+    .archive-year h3 {
+      font-family: var(--font-terminal);
+      font-size: 26px;
+      color: var(--lavender-grey);
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+    }
+    .archive-list {
+      list-style: none;
+      padding-left: 8px;
+    }
+    .archive-list li {
+      font-family: var(--font-terminal);
+      font-size: 22px;
+      color: var(--slate-grey);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .archive-list li::before {
+      content: '▸';
+      color: var(--lavender-grey);
+      font-size: 18px;
+    }
+
+    .about-sprite {
+      width: 128px;
+      height: 128px;
+      display: grid;
+      grid-template-columns: repeat(32, 1fr);
+      grid-template-rows: repeat(32, 1fr);
+      image-rendering: pixelated;
+      margin-bottom: 24px;
+      border: 2px solid var(--slate-grey);
+      background: var(--shadow-grey);
+      padding: 4px;
+    }
+    .about-sprite span {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .footer {
+      border-top: 1px solid var(--slate-grey);
+      padding: 40px 24px;
+      text-align: center;
+      font-family: var(--font-terminal);
+      font-size: 18px;
+      color: var(--slate-grey);
+      letter-spacing: 0.06em;
+      position: relative;
+      overflow: hidden;
+    }
+    .footer .divider {
+      width: 120px;
+      height: 2px;
+      margin: 16px auto;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--lavender-grey) 0px,
+        var(--lavender-grey) 4px,
+        transparent 4px,
+        transparent 8px
+      );
+    }
+    .footer .code-columns {
+      opacity: 0.25;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      pre.ascii-art {
+        font-size: 7px;
+        line-height: 0.55em;
+      }
+      .tv-frame {
+        padding: 12px 12px 32px 12px;
+      }
+      .ascii-inner-title h1 {
+        font-size: 10px;
+      }
+      .hero {
+        padding: 40px 16px 60px;
+        min-height: 80vh;
+      }
+      .code-col {
+        opacity: 0.04;
+      }
+    }
+
+    @media (max-width: 600px) {
+      pre.ascii-art {
+        font-size: 5px;
+        line-height: 0.55em;
+      }
+      .ascii-inner-title h1 {
+        font-size: 8px;
+      }
+      .tv-frame {
+        padding: 8px 8px 28px 8px;
+      }
+      .nav-links {
+        gap: 16px;
+      }
+      .nav-links a {
+        font-size: 20px;
+      }
+      .nav-links a::before {
+        display: none;
+      }
+      .brand {
+        font-size: 9px;
+      }
+      .section-header {
+        font-size: 22px;
+      }
+      .post-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero-slogan {
+        font-size: 20px;
+      }
+      .btn {
+        font-size: 9px;
+        padding: 12px 20px;
+      }
+      .about-sprite {
+        width: 96px;
+        height: 96px;
+      }
+    }
+
+    /* ─── REDUCED MOTION ─── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
+      .code-col {
+        animation: none;
+        opacity: 0;
+      }
+      body::after {
+        animation: none;
+      }
+      .tv-wrapper, pre.ascii-art {
+        animation: none;
+        opacity: 1;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Top Bar (Polybar-style) -->
-    <div class="topbar" id="topbar">
-        <div class="topbar-left">
-            <span class="topbar-workspace active">1</span>
-            <span class="topbar-workspace">2</span>
-            <span class="topbar-workspace">3</span>
-            <span class="topbar-workspace">4</span>
-            <span class="topbar-separator">|</span>
-            <span class="topbar-title">~/blog</span>
+
+  <!-- ─── TOP BAR ─── -->
+  <header class="top-bar" id="topBar">
+    <div class="top-bar-inner">
+      <div class="brand">
+        <div class="penguin-sprite" aria-hidden="true">
+          <!-- 8x8 penguin: ink body, lavender belly highlight -->
+          <span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span>
+          <span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--slate-grey)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--slate-grey)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span>
+          <span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--slate-grey)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--slate-grey)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span>
+          <span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--lavender-grey)"></span><span style="background:var(--lavender-grey)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span>
+          <span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--lavender-grey)"></span><span style="background:var(--lavender-grey)"></span><span style="background:var(--lavender-grey)"></span><span style="background:var(--lavender-grey)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span>
+          <span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--lavender-grey)"></span><span style="background:var(--lavender-grey)"></span><span style="background:var(--lavender-grey)"></span><span style="background:var(--lavender-grey)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span>
+          <span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--slate-grey)"></span><span style="background:var(--slate-grey)"></span><span style="background:var(--slate-grey)"></span><span style="background:var(--slate-grey)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span>
+          <span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span><span style="background:var(--ink-black)"></span>
         </div>
-        <div class="topbar-center">
-            <span class="topbar-cpu" id="cpu-graph"></span>
-            <span class="topbar-separator">|</span>
-            <span class="topbar-mem" id="mem-bar"></span>
-        </div>
-        <div class="topbar-right">
-            <span class="topbar-stat" id="topbar-cpu">CPU: 12%</span>
-            <span class="topbar-stat" id="topbar-ram">RAM: 2.4G/16G</span>
-            <span class="topbar-stat" id="topbar-temp">66°C</span>
-            <span class="topbar-stat" id="topbar-net">↓ 58.3 MiB ↑ 1.71 MiB</span>
-            <span class="topbar-clock" id="topbar-clock">Sun 09 Aug 17:15</span>
-        </div>
+        retro::blog
+      </div>
+      <nav aria-label="Main navigation">
+        <ul class="nav-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#posts">Posts</a></li>
+          <li><a href="#archive">Archive</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero" id="home">
+    <div class="code-columns" aria-hidden="true">
+      <div class="code-col">&gt; boot sequence OK<br>:: loading retro.sys<br>:: mount /dev/blog0</div>
+      <div class="code-col">&gt; init pixel_driver<br>:: crt_scanlines on<br>:: phosphor glow 0.3</div>
+      <div class="code-col">&gt; synthwave grid up<br>:: horizon line set<br>:: lavender accent</div>
+      <div class="code-col">&gt; kernel 6.9.retro<br>:: arch linux<br>:: pacman -Syu</div>
+      <div class="code-col">&gt; vga text mode<br>:: 80x25 pixels<br>:: vt323 loaded</div>
+      <div class="code-col">&gt; read ascii art<br>:: preserve bytes<br>:: do not clean</div>
+      <div class="code-col">&gt; cursor blink<br>:: steps(2) infinite<br>:: block ▮</div>
     </div>
 
-    <!-- Main Tiling Layout -->
-    <div class="tiling-container">
-        <!-- Panel 1: ASCII Art / Visual -->
-        <div class="panel panel-visual" id="panel-visual">
-            <div class="panel-header">
-                <span class="panel-title">ascii</span>
-                <span class="panel-controls">
-                    <span class="ctrl-min">─</span>
-                    <span class="ctrl-max">□</span>
-                    <span class="ctrl-close">✕</span>
-                </span>
+    <div class="tv-wrapper">
+      <div class="tv-frame">
+        <div class="tv-screen">
+          <div class="ascii-container">
+            <pre class="ascii-art" id="asciiArt" aria-label="ASCII art oval ring"></pre>
+            <div class="ascii-inner-title">
+              <h1>RETRO::BLOG<br><span class="cursor blink">▮</span></h1>
             </div>
-            <div class="panel-content visual-content">
-                <pre id="ascii-art"></pre>
-            </div>
+          </div>
         </div>
-
-        <!-- Panel 2: System Stats (htop-style) -->
-        <div class="panel panel-stats" id="panel-stats">
-            <div class="panel-header">
-                <span class="panel-title">cpu</span>
-                <span class="panel-controls">
-                    <span class="ctrl-min">─</span>
-                    <span class="ctrl-max">□</span>
-                    <span class="ctrl-close">✕</span>
-                </span>
-            </div>
-            <div class="panel-content stats-content">
-                <div class="stats-header">
-                    <span>i5-6440HQ</span>
-                    <span>2.7 GHz</span>
-                </div>
-                <div class="stats-row">
-                    <span>CPU</span>
-                    <div class="stat-bar-container">
-                        <div class="stat-bar" id="stat-cpu-bar" style="width: 52%"></div>
-                    </div>
-                    <span id="stat-cpu-pct">52%</span>
-                    <span id="stat-cpu-temp">66°C 19.6W</span>
-                </div>
-                <div class="stats-cores">
-                    <div class="core-row"><span>C0</span><span class="core-bar-wrap"><div class="core-bar" style="width:49%"></div></span><span>49%</span><span>63°C</span><span>C2</span><span class="core-bar-wrap"><div class="core-bar" style="width:53%"></div></span><span>53%</span><span>60°C</span></div>
-                    <div class="core-row"><span>C1</span><span class="core-bar-wrap"><div class="core-bar" style="width:50%"></div></span><span>50%</span><span>62°C</span><span>C3</span><span class="core-bar-wrap"><div class="core-bar" style="width:55%"></div></span><span>55%</span><span>59°C</span></div>
-                </div>
-                <div class="stats-divider">total ▲▼ gpu-totals</div>
-                <div class="stats-row">
-                    <span>GPU</span>
-                    <div class="stat-bar-container">
-                        <div class="stat-bar gpu-bar" style="width: 56%"></div>
-                    </div>
-                    <span>56%</span>
-                    <span>5.02W</span>
-                </div>
-                <div class="stats-uptime" id="stats-uptime">up 00:10:35</div>
-            </div>
+        <div class="tv-knobs" aria-hidden="true">
+          <div class="tv-knob"></div>
+          <div class="tv-knob"></div>
         </div>
-
-        <!-- Panel 3: Main Blog Content (Terminal) -->
-        <div class="panel panel-main" id="panel-main">
-            <div class="panel-header">
-                <span class="panel-title">blog</span>
-                <span class="panel-controls">
-                    <span class="ctrl-min">─</span>
-                    <span class="ctrl-max">□</span>
-                    <span class="ctrl-close">✕</span>
-                </span>
-            </div>
-            <div class="panel-content terminal-content">
-                <div class="terminal-prompt">
-                    <span class="prompt-user">user</span><span class="prompt-at">@</span><span class="prompt-host">blog</span>
-                    <span class="prompt-path"> ~/posts </span>
-                    <span class="prompt-symbol">$</span>
-                    <span class="prompt-cmd">ls -la</span>
-                    <span class="cursor-blink">█</span>
-                </div>
-                <div class="terminal-output" id="blog-list">
-                    <!-- Blog posts injected by JS -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Panel 4: Memory/Disks -->
-        <div class="panel panel-memory" id="panel-memory">
-            <div class="panel-header">
-                <span class="panel-title">mem</span>
-                <span class="panel-controls">
-                    <span class="ctrl-min">─</span>
-                    <span class="ctrl-max">□</span>
-                    <span class="ctrl-close">✕</span>
-                </span>
-            </div>
-            <div class="panel-content memory-content">
-                <div class="mem-section">
-                    <div class="mem-row"><span>Total:</span><span>11.5 GiB</span></div>
-                    <div class="mem-row"><span>Used:</span><span>2.47 GiB</span><div class="mem-bar-wrap"><div class="mem-bar used-bar" style="width:21%"></div></div><span>21%</span></div>
-                    <div class="mem-row"><span>Avail:</span><span>9.09 GiB</span></div>
-                    <div class="mem-row"><span>Cache:</span><span>2.14 GiB</span><div class="mem-bar-wrap"><div class="mem-bar cache-bar" style="width:79%"></div></div><span>79%</span></div>
-                    <div class="mem-row"><span>Free:</span><span>7.56 GiB</span><div class="mem-bar-wrap"><div class="mem-bar free-bar" style="width:19%"></div></div><span>19%</span></div>
-                </div>
-                <div class="mem-divider">disks</div>
-                <div class="disk-section">
-                    <div class="disk-row"><span>root</span><span>20G</span></div>
-                    <div class="disk-row"><span>IO</span></div>
-                    <div class="disk-row"><span>U</span><div class="disk-bar-wrap"><div class="disk-bar" style="width:13%"></div></div><span>13G</span></div>
-                    <div class="disk-row"><span>swap</span><span>4.0G</span></div>
-                    <div class="disk-row"><span>U</span><div class="disk-bar-wrap"><div class="disk-bar" style="width:0%"></div></div><span>0B</span></div>
-                    <div class="disk-row"><span>home</span><span>28G</span></div>
-                    <div class="disk-row"><span>56K</span></div>
-                    <div class="disk-row"><span>U</span><div class="disk-bar-wrap"><div class="disk-bar" style="width:11%"></div></div><span>11G</span></div>
-                    <div class="disk-row"><span>boot</span><span>1.0G</span></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Panel 5: Network -->
-        <div class="panel panel-net" id="panel-net">
-            <div class="panel-header">
-                <span class="panel-title">net</span>
-                <span class="panel-controls">
-                    <span class="ctrl-min">─</span>
-                    <span class="ctrl-max">□</span>
-                    <span class="ctrl-close">✕</span>
-                </span>
-            </div>
-            <div class="panel-content net-content">
-                <div class="net-section">
-                    <div class="net-label">download</div>
-                    <div class="net-row"><span>▼ 0 Byte/s</span></div>
-                    <div class="net-row"><span>▼ Top: (936 bitp)</span></div>
-                    <div class="net-row"><span>▲ Total: 58.3 MiB</span></div>
-                    <div class="net-label">upload</div>
-                    <div class="net-row"><span>▲ 0 Byte/s</span></div>
-                    <div class="net-row"><span>▲ Top: (456 bitp)</span></div>
-                    <div class="net-row"><span>▼ Total: 1.71 MiB</span></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Panel 6: About / Neofetch -->
-        <div class="panel panel-about" id="panel-about">
-            <div class="panel-header">
-                <span class="panel-title">about</span>
-                <span class="panel-controls">
-                    <span class="ctrl-min">─</span>
-                    <span class="ctrl-max">□</span>
-                    <span class="ctrl-close">✕</span>
-                </span>
-            </div>
-            <div class="panel-content about-content">
-                <div class="neofetch">
-                    <pre class="neofetch-ascii">
-     _____
-    /  ___|
-    \ `--.  ___  _ __ ___
-     `--. \/ _ \| '_ ` _ \
-    /\__/ / (_) | | | | | |
-    \____/ \___/|_| |_| |_|
-                    </pre>
-                    <div class="neofetch-info">
-                        <div class="neofetch-line"><span class="nf-label">user</span><span class="nf-sep">@</span><span class="nf-host">blog</span></div>
-                        <div class="neofetch-line"><span class="nf-sep">─────────────</span></div>
-                        <div class="neofetch-line"><span class="nf-key">OS:</span> <span class="nf-val">Arch Linux x86_64</span></div>
-                        <div class="neofetch-line"><span class="nf-key">Host:</span> <span class="nf-val">Retro Terminal Blog</span></div>
-                        <div class="neofetch-line"><span class="nf-key">Kernel:</span> <span class="nf-val">6.1.0-arch</span></div>
-                        <div class="neofetch-line"><span class="nf-key">Uptime:</span> <span class="nf-val" id="nf-uptime">10 mins</span></div>
-                        <div class="neofetch-line"><span class="nf-key">Shell:</span> <span class="nf-val">zsh 5.9</span></div>
-                        <div class="neofetch-line"><span class="nf-key">WM:</span> <span class="nf-val">bspwm</span></div>
-                        <div class="neofetch-line"><span class="nf-key">Terminal:</span> <span class="nf-val">kitty</span></div>
-                        <div class="neofetch-line"><span class="nf-key">CPU:</span> <span class="nf-val">i5-6440HQ @ 2.7GHz</span></div>
-                        <div class="neofetch-line"><span class="nf-key">GPU:</span> <span class="nf-val">Intel HD 530</span></div>
-                        <div class="neofetch-line"><span class="nf-key">Memory:</span> <span class="nf-val">2470MiB / 11520MiB</span></div>
-                        <div class="neofetch-colors">
-                            <span class="nf-color" style="background:#1a1b26"></span>
-                            <span class="nf-color" style="background:#7dcfff"></span>
-                            <span class="nf-color" style="background:#bb9af7"></span>
-                            <span class="nf-color" style="background:#9ece6a"></span>
-                            <span class="nf-color" style="background:#f7768e"></span>
-                            <span class="nf-color" style="background:#e0af68"></span>
-                            <span class="nf-color" style="background:#7aa2f7"></span>
-                            <span class="nf-color" style="background:#c0caf5"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="about-text">
-                    <p>Hi, I'm a developer who loves Linux, minimalism, and the terminal. This blog is my digital garden — a place where I share thoughts on code, design, and open source.</p>
-                    <p class="about-links">
-                        <a href="#" class="about-link">[GitHub]</a>
-                        <a href="#" class="about-link">[Twitter]</a>
-                        <a href="#" class="about-link">[RSS]</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Panel 7: Tags -->
-        <div class="panel panel-tags" id="panel-tags">
-            <div class="panel-header">
-                <span class="panel-title">tags</span>
-                <span class="panel-controls">
-                    <span class="ctrl-min">─</span>
-                    <span class="ctrl-max">□</span>
-                    <span class="ctrl-close">✕</span>
-                </span>
-            </div>
-            <div class="panel-content tags-content" id="tags-list">
-                <!-- Tags injected by JS -->
-            </div>
-        </div>
+        <div class="tv-brand-label">ARCH_SYNTH</div>
+      </div>
     </div>
 
-    <!-- Bottom Command Bar -->
-    <div class="command-bar" id="command-bar">
-        <span class="cmd-prompt">user@blog:~$</span>
-        <input type="text" class="cmd-input" id="cmd-input" placeholder="type 'help' for commands..." autocomplete="off" spellcheck="false">
-        <span class="cursor-blink cmd-cursor">█</span>
-    </div>
+    <p class="hero-slogan">// musings from a basement terminal //</p>
+    <a href="#posts" class="btn">READ POSTS</a>
+    <p class="scroll-hint blink" aria-hidden="true">▼_</p>
+  </section>
 
-    <!-- Post Modal (Terminal Window Overlay) -->
-    <div class="modal-overlay" id="modal-overlay">
-        <div class="modal-window" id="modal-window">
-            <div class="modal-header">
-                <span class="modal-title" id="modal-title">post</span>
-                <span class="modal-controls">
-                    <span class="ctrl-min">─</span>
-                    <span class="ctrl-max">□</span>
-                    <span class="ctrl-close" id="modal-close">✕</span>
-                </span>
-            </div>
-            <div class="modal-content" id="modal-content">
-                <!-- Post content injected by JS -->
-            </div>
+  <!-- ─── BLOG POST LIST ─── -->
+  <section class="section" id="posts">
+    <div class="section-inner">
+      <div class="section-header">
+        ## [ LATEST_TRANSMISSIONS ]<span class="cursor blink">▮</span>
+      </div>
+      <div class="post-grid" id="postGrid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── ARCHIVE ─── -->
+  <section class="section" id="archive" style="background:var(--shadow-grey);">
+    <div class="section-inner reveal">
+      <div class="section-header">
+        ## [ ARCHIVE ]<span class="cursor blink">▮</span>
+      </div>
+      <div class="archive-year">
+        <h3>2026 ▸</h3>
+        <ul class="archive-list">
+          <li>Building a synthwave renderer in pure CSS</li>
+          <li>Why I still write assembly for fun</li>
+          <li>CRT shaders for the web: a love letter</li>
+        </ul>
+      </div>
+      <div class="archive-year">
+        <h3>2025 ▸</h3>
+        <ul class="archive-list">
+          <li>RetroArch setup for pixel-perfect gaming</li>
+          <li>Demoscene tricks: dithering and palette cycling</li>
+          <li>A terminal-based blog engine in 200 lines</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── ABOUT ─── -->
+  <section class="section" id="about">
+    <div class="section-inner reveal">
+      <div class="section-header">
+        ## [ ABOUT ]<span class="cursor blink">▮</span>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:40px; align-items:flex-start;">
+        <div class="about-sprite" id="aboutSprite" aria-label="Pixel art portrait of the author" role="img">
+          <!-- 32x32 pixel art filled by JS -->
         </div>
+        <div style="flex:1; min-width:260px;">
+          <p style="font-family:var(--font-terminal); font-size:24px; color:var(--slate-grey); line-height:1.6; margin-bottom:20px;">
+            I'm a systems tinkerer and pixel enthusiast. This blog is a love letter to the cold blue glow of CRT monitors, the smell of old electronics, and the joy of writing code that runs close to the metal. Expect posts about retro-computing, gamedev, and the occasional synthwave aesthetic experiment.
+          </p>
+          <p style="font-family:var(--font-terminal); font-size:20px; color:var(--slate-grey); opacity:0.8;">
+            // currently: exploring bare-metal Raspberry Pi graphics.
+          </p>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <script src="script.js"></script>
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <div class="code-columns" aria-hidden="true">
+      <div class="code-col" style="left:10%; animation-duration:38s;">&gt; exit 0<br>:: shutdown -h now</div>
+      <div class="code-col" style="left:70%; animation-duration:42s;">&gt; logout<br>:: see you next boot</div>
+    </div>
+    <div style="position:relative; z-index:2;">
+      <div class="divider" aria-hidden="true"></div>
+      <p>© 2026 — assembled in a basement</p>
+      <p style="font-size:14px; opacity:0.6; margin-top:8px;">[ 5 colors : 2 fonts : 1 ascii oval ]</p>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // ─── 0. ASCII ART (exact block, rendered as provided) ───
+      const asciiBlock = `████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███
+████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+██████████████▓███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▓███████████████████████████████████▓█████████████████████
+████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███
+████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+██████████████████████████████████████████████████████████████████████████████▓███▓███████████▓███▓███▓███▓███▓███▓███▓███▓███▓█████████████████████████████████████████████████████████████████████████
+███████████████████████████████████████████████████████████████████████████████████████████████▓▒░▒░▒░░░░░▒░▒░▓▓████████████████████████████████████████████████████████████████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓█▓█▓█▓█▓█▓█▓█▓▓▓█▓█▓█▓█▓█▓▒             ░▒█▓█▓█▓█▓█▓▒▒▓▓█▓█▓█▓█▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███
+█████████████████████████████████████████████████████████████████████████████▓▓▒▒░░ ░▒███████▓█▒░            ░▒▒▓▓█▓███▓▒     ░░▓▓██████████████████████████████████████████████████████████████████████
+██████████████████████████▓███████████████████████████████████████████▓█▓▓░░         ░▒▒░░░░ ░                     ░ ░░░           ░░▓▓███████▓█████████████████████████████████████████████████████████
+███████████████████████████████████████████████████████████████████████▒░                                                           ▒▓██████████████████████████████████████████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓█▓█▓█▓█▒░                                                         ░░▓▓█▓█▓█▓█▓█▓█▓█▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███
+█████████████████████████████████████████████████████████████▓▓▓█████▓▓▒▒░                                                            ░░▓▓█▓█▓▒░▒▒██████████████████████████████████████████████████████
+██████████████████████████▓███████████████████████████▓█▓█▓▒░░ ░▒█▓▓░░                                                                   ░░▒▒░     ░▒█▓█▓█▓███████████████████████████████▓█████████████
+█████████████████████████████████████████████████████▓██▓░░     ░ ░                                                                                   ▒▓████████████████████████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓█▓█▓█▒░                                                                                               ░░▓▓█▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███
+███████████████████████████████████████████████████▓▓░                                    ░░▒▒▒▒▓▓▓▓█▓▓▓█▓▓▓▓▓▓▒▒▒▒░░                                   ░▒██████████████████████████████████████████████
+██████████████████████████▓███████████████████████▓█▓▒                             ░░▒▒▓▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓▓▒▒ ░                           ▒▓█▓█▓█▓███████████████████████████▓█████████████
+███████████████████████████████████████████████████▓██▓░                        ▒▒▓██▓███▓███████▓███████▓███▓███▓███▓█▓███▓▓▒▒░                        ▒▓█▓█▓██████████████████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓█▓█▓█▓█▓█▓█▓▒                     ░░▒▓█▓█▓█▓█▓█▓███▓███▓███▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓▒░░                      ░▓▓█▓█▓█▓█▓█▓█▓███▓███▓███▓███▓███▓███▓███▓███
+███████████████████████████████████████████▓▓▓███▓▓▒░                   ░▒▓▓███▓███████████████████████████████████████████████▓███▓▓▒░                     ▒▓█▓▒░░▒████████████████████████████████████
+██████▓███████████████████████████████▓█▓█▓▒  ░▒▒▒                   ░░▓▓█▓█▓█▓███████████████▓███▓█▓█▒▒▓█▓█▓█▓███▓███████▓███▓███▓█▓█▓▓░░                   ░░░    ░▓▓█▓███████████████████████████████
+█████████████████████████████████████████▒░                        ░▒▓███▓███████████████████████▓███▓▒ ▒▓███████████████████████████▓███▓▒░                  ░░▒░▒░░░▓█████████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓███▓█▓█▒░ ░░░░░                 ░▒█▓█▓█▓█▓█▓█▓█▓███▓███▓███▓█▓█▓█▓█▓▒   ▓▓█▓█▓█▓███▓███▓███▓█▓█▓███▓█▓█▓█▓█▒░             ░ ░░░░░░░ ░░▒▓█▓█▓███▓███▓███▓███▓███▓███▓███
+██████████████████████████████████████▓░░ ░░░░▒░░░░░           ░▓▓█▓███████████████████████████████▓▓░   ░█▓███████████████████████████████▓█▓▓░      ░░░░░░▒░░░░░░░░   ▒▓██████████████████████████████
+██████████████████████████████████▓█▓▓░  ░░░░░░░ ░░░░░░░     ░▒▓▓█▓█▓█▓███▓███▓███▓███▓█▓█▓███▓█▓█▓▓░░   ░▒█▓█▓███▓███▓███▓███▓███████████▓█▓█▓▓▒░   ░░░░░░░ ░ ░ ░░░░░   ▒▓█▓█▓█████████████████████████
+████████████████████████████████████▓░  ░░░░░░░░░░░░░░░░▒  ░▒▓█▓█▓███████████████████████████████▓█▒░ ░░░ ▒▓█▓███████████████████████████████████▓▒  ░▒░░░░░░ ░░░ ░░░░░░  ▒▓████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓█▓▓   ░░░░░░  ░ ░ ░ ░ ░░░░▓▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▒░ ░░▓   ▒▓█▓█▓█▓█▓█▓█▓███▓███▓███▓███▓███▓█▓█▓█▓▓░░ ░ ░░░ ░ ░░░ ░ ░ ░   ▒▓█▓█▓███▓███▓███▓███▓███▓███
+██████████████████████████████████▓░ ░░░░░░░░░░░░░░░░░░ ░▒█████████████████████████████████████▓█▓▒  ░▓▓▓   ▓████████████████████████████████████████▒░ ░░░░░ ░░░░░ ░░░░░░░░▓▓██████████████████████████
+██████████████████████████████▓█▓▓░░ ░ ░░░░░░░ ░ ░░░░░ ░▒█▓█▓█▓███▓███▓███▓███▓███▓███▓███▓█▓█▓█▓▒   ▒▓█▓▒  ░▓▓█▓█▓███▓███████████████████████████▓█▓█▒░ ░░░░░ ░░░ ░ ░ ░░░░░░▓▓█▓█▓█████████████████████
+█████████████████████████████████▒░░▒░░░░░░░░ ░░░░░░░ ░▒█▓███████████████████████████████████▓██▓░  ▒▓█▓█▒░ ░▒███████████████████████████████████████▓█▒░ ░░░░░ ░░░░░░░░░░░ ░░▓█████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓█▓█▒░   ░░░░░░░ ░ ░ ░ ░ ░▒█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█░░ ░▒▓▓█▓█░░ ░▒█▓█▓█▓███▓███▓███▓███▓███▓███▓███▓███▓█▓█▒░ ░░░░░ ░░░░░░░░▒░░░░░█▓█▓█▓███▓███▓███▓███▓███
+███████████████████████████████▓░░░ ▒▒▒░░░░░░░░░░░░ ░▒█████████████████████████████████████████▓░ ░▒███▓███░  ▒▓█████████████████████████████████████████▓▒░▒░░░▒░▒░░░░  ░▒░░ ▒▒████████████████████████
+██████▓███████████████████▓█▓█▓▒░░ ▒░░  ░░░░░░░░░░░░▒█▓█▓█▓███▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓░  ░▓▓█▓█▓█▓▓   ▒▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓███▓███████▓█▓█▒░ ░ ░░░ ░░▒░░░░░░ ░ ░▓█▓█████████████████████
+█████████████████████████████▓▓░░░░░▒░░░▒░░  ░░ ░ ░▒▓▓███████████▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓▒ ░▒██████████▒  ░▓▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█████████████▓█░░ ░░▒▒▒░░ ▒░  ░░▒  ░▓▓██████████████████████
+▓███▓███▓███▓███▓███▓███▓█▓█▓▓▒░ ░░░   ░░░ ░░▒░░ ░░▓▓█▓█▓█▓█▓█▓█▓█▒░                       ░░▓▓█▓█▓█▓█▓█▓█▓█▒░                             ▒▓███▓███▓███▓█▓▓░░   ░░░ ░░░ ░░░░ ░░ ▓▓█▓███▓███▓███▓███▓███
+█████████████████████████████▒░░░ ▒░░░░░▒░░ ░░░ ░░▓▓█████████████████▒░               ░░▓▓███████████████████▓▒░▒░▒░▒░▒░▒░▒░▒░▒░▒░░     ▒▓█████████████████▓▒░░░░░▒░░ ░░░ ░░▒░░ ░▓██████████████████████
+██████▓███████████████████▓█▓▓  ░░░░ ░░░   ▒▒░░░ ░▒█▓█▓███▓███▓█▓█▓█▓█▓▓▒░         ▒▒▓▓█▓█▓███▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▓▒███▓███▓███▓█▓█▓▓▒░   ░▒███▓███▓███████▓███▓█▓▒   ░░░░░░░░░░░░░  ░▒▓█▓█▓█████████████████
+████████████████████████████▓▒░  ░▒░░░▒░░░░░░   ░▒███▓███████████████▓█▓█▓▓░░ ▒▒▓▓█▓█▓███▓█████▒              ▒▓█▓███████▓███▒░   ░▒████████████████████████▓░░░░░░░░ ░░░  ░░░░░░░██████████████████████
+▓███▓███▓███▓███▓███▓███▓█▓█▒░ ░ ░░░ ░░░   ░░░░░ ▒▓█▓█▓█▓█▓█▓█▓█▓███▓█▓█▓█▓█▓█▓█▓▓▓▒░░ ▒▒█▓█▓█▓▓░▒░▒░░ ░ ▒░▒░▒▒█▓█▓█▓█▓█▓█▓▒   ░░▓▓█▓█▓█▓███▓███▓███▓███▓█▓█▓▓░░ ░░▒░░ ░░░   ▒░  ▒▒█▓███▓███▓███▓███▓███
+████████████████████████████▓▒░ ░░░ ░░▒░░░▒░░ ░░▒▓█▓███████████████████████████▓▓░       ░▒▓█████████▒░ ▒██████████████▓▒░  ░░▓▓█████████████████████████████▒░░░░░░░ ░░▒░░░▒░░░▒░▒▓████████████████████
+██████▓███████████████████▓█▒░ ░ ░░░ ░░░   ░░░ ░░▓▓█▓█▓███▓███▓███████▓███▓█▓█▓█▓█▒░   ░░▒▒███▓█▓█▓█▓▒ ░░█▓█▓█▓█▓█▓█▓▓░    ▒▓█▓███▓███▓███████████████████▓██▓░    ▒░░ ░░░  ░▒░░ ░▒█▓█▓█████████████████
+████████████████████████████▓░  ░░░ ░░░ ░░▒░░  ░▒▓███████████████████████████████▓███▓███████████▓███▒░ ▒▓███████▓▓░░   ▒▓███████████████████████████████████▓▒░▒░░░░ ░░▒░░░░░░ ░░▒▓████████████████████
+▓███▓███▓███▓███▓███▓███▓█▓█▒░░░ ░░░ ░░░   ░ ░░░░▓▓█▓█▓█▓███▓███▓███▓███▓███▓█▓█▓█▓█▓█▓█▒▒░░▒█▓▓▒▒▒▒▒░ ░░▒▒▒▒▒▓█▓▓░  ░▒█▓█▓█▓███▓███▓███▓███▓███▓███▓███▓█▓█▓▓░  ░░▒░░ ░░░  ░▒░░ ░▒█▓█▓█▓███▓███▓███▓███
+████████████████████████████▓░░░▒░░ ░░░  ░▒▒░   ▒▓█▓███████████████████████████████████▓▒ ░░███▒              ▒▓██▓░ ░▓▓█████████████████████████████████████▓▒░░ ░░░░░░░░░░░░░ ░░▓▓████████████████████
+██████████████████████████▓█▒▒░░ ░░░░░ ░░░ ░ ░░░░▓▓█▓█▓███████████████████████▓███▓█▓█▓▒  ░▓▓█▓▓░▒░░░▒░░░▒░░░▒▒▓▓█▓▒  ░▓▓█▓███████████████████████████████▓██▓░  ░░▒   ▒░░ ░░▒░░ ░▒█▓█▓█████████████████
+████████████████████████████▓░░░░░░ ░░▒░░ ░▒▒░  ▒▓███████████████████████████████████▓▓░  ▒▓█▓█████▓█▓███▓███████▓█▓░ ░▒█████████████████████████████████████▒░░░ ░░░  ░░ ░░░░░ ░░██████████████████████
+▓███▓███▓███▓███▓███▓███▓█▓█▓▒   ░░░ ░░░ ░░░ ░░░ ▒▓█▓█▓█▓███▓███▓███▓███▓███▓███▓█▓█▓▓░░ ░▓█▓█▓█▓█▓█▓▒░░░▓▓█▓█▓█▓█▓█▒░ ░▒█▓█▓███▓███▓███▓███▓███▓███▓███▓█▓█▓▒   ░░░ ░░░░░ ░░░ ░ ░▒█▓█▓█▓███▓███▓███▓███
+█████████████████████████████▒░░░░▒ ░░▒░▒░ ░▒░░ ░▒▓████████████████████████████████▓█▓░ ░▒█▓██████▓░░     ░▒█████████░░ ▒▓██████████████████████████████████▓░░░░░▒░  ▒░░░░░▒░░ ░▒██████████████████████
+██████████████▓███▓███████▓█▓▓░░ ░░░░░ ▒░  ░░░ ░░░▒█▓█▓█████████████████████████▓█▓█▓░ ░▒▓▓█▓█▓▓▒░   ░▒▓░░   ▒▒█▓█▓█▓▓   ▒▓█▓█▓███████▓███▓███▓███████▓███▓▓░░ ░░░░░░░░▒░  ░░░░░░▒▓█▓█▓███▓███▓█████████
+█████████████████████████████▓▒░░ ▒░░ ░░░░░░░░▒   ▒▓█████████████████████████████▓█▓▒  ░▓▓███▒▒   ░▒▓▓█▓█▓▓░   ░▒▓███▓▒  ░▓██████████████████████████████▓█▒░░░ ░░░ ░░▒ ░░░░▒░  ▒▓██████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓█▒░ ░░▒░░ ░░▒   ▒ ░ ░░▒▓█▓█▓███▓███▓███▓███▓███▓█▓█▓█▓▓   ▒▓█▒▒    ░▓▓█▓█▓█▓▓▓█▓▒░   ░▒▓█▒░ ░░▓▓█▓█▓███▓█▓█▓█▓█▓█▓█▓███▓█▓█▓█▓░  ░░░░░░ ░░░ ░░░ ░░░▒▓▓█▓███▓███▓███▓███▓███
+███████████████████████████████▒▒░░░▒ ░░▒░░░▒░▒░░ ░░██████████████████████████████▓░  ▒▓▒░   ░▓████████████▓███▓▒░   ░▓▒░ ░▒█████████████████████████████▓▒░░  ░▒ ░░▒░  ▒░▒░░░░░████████████████████████
+██████████████████████████▓█▓█▓▓░░ ░░▒░░ ▒▒░  ░░ ░░░░▓▓███▓███████████████████▓█▓█▒░ ░ ░  ░▒▓█▓█▓█▓█▓█▓███▓█▓█▓█▓█▒░   ░   ░▓█▓███▓███▓███▓███▓███████▓█▓▒   ░░░░░ ░░░░░░▒░░░░░▒░▒▓█████████████████████
+█████████████████████████████▓▒▒▒░░░░░░░░░▒░░░░░▒░░ ░░███████████████████████████▒░    ░▒▓███████████████████████▓██▓▒░     ▒▓███████████████████████▓█▓▒░░░ ░▒░░ ▒▒▒ ░░▒░░ ░░▒▒░░██████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓▓░░░▒ ░ ░░░  ░▒░░ ░░░ ░░░░▓▓█▓█▓███▓███▓███▓███▓█▓█▓▒   ░▒▓▓█▓█▓█▓█▓█▓█▓█▓█▓███▓█▓█▓█▓█▓█▓▓░░   ▓▓█▓███▓███▓███▓███▓███▓█▓▒   ░░░ ░ ░░░ ░ ░ ░ ░ ░▒░░▓▓█▓███▓███▓███▓███▓███
+██████████████████████████████▓░▒▒▒░░░░░░░░░▒░░░░░▒░  ░░▓██▓████████████████████▓░░▒███▓██████████████████████████████████▓░░░███████████████████████▒░ ░░░░▒░░ ░▒▒░ ░▒░░   ░▒▓▓████████████████████████
+██████████████▓███████████▓███▓█▓▓▒░ ░ ░░░ ░░▒░░ ░░░░░░ ░▓▓█▓█▓█▓█▓███▓█████████▓▓▓███▓█▓█▓███▓███████████████▓███████▓█▓█▓█▓▓▓███▓███▓███▓█▓█▓█▓█▒▒▒▒░░░▒░▒░▒░░░▒░▒░▒░░░▒░░░░░███▓█████████████████████
+█████████████████████████████████░░░░░▒░▒░▒░░░▒░▒░▒░░░░░░ ░░▒▒▓██▓███████████████████████████████████████████████████████████████████████▓█▓█▓█▒▒                           ░▒██████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓█▓█▓▓▒░                           ░░▓▓█▓█▓█▓███▓███▓███▓███▓███▓███▓█▓█▓█▓█▓███▓███▓███▓███▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▒▒                             ░▒█▓█▓███▓███▓███▓███▓███▓███
+███████████████████████████████████▒░                             ▒▓███████████████████████████████████████████████████████████████████▓██▓░░                             ░▒████████████████████████████
+██████████████████████████████▓█▓█▓█▒░                              ░▓▓█▓█▓███▓███▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓███▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▓█▒░                               ░▒█▓█▓█████████████████████████
+█████████████████████████████████████▓░                               ░▒█████████▓█████▓▓▓▓▒▒░▒░░░░░░░░░░░░░░░░░▒░▒▒▒▒▓▓█▓███████▓███▓▓░                                ▒▓██████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓█▓█▓█▓▒                                 ▒▓█▓█▓█▓▓▒▒░░                                     ░░▒▒▓▓█▓█▒░ ░ ░ ░ ░░░░░░░░░░░░░░░ ░        ░▒▓█▓█▓███▓███▓███▓███▓███▓███▓███
+███████████████████████████████████████▓▓░░ ░ ░ ░░░░▒░▒░▒░▒░▒░▒░▒░▒░▒░▒▒▓▒▓▓▓▒░                                                 ░░▒▒▓▒▓▓▒░░░░░░░░░░░░░░ ░░░░░░░░▒░▒▒▒▓██████████████████████████████████
+██████████████████████████████████████▓█▓▓░▒▒▒░░░░ ░░░   ░   ░   ░ ░ ░░▒░░                                                           ░ ░░░░░   ░   ░   ░ ░ ░ ░  ░▒░░░▓▓█▓█▓███████████████████▓█████████
+█████████████████████████████████████████▓▒ ░▒▒   ░  ░░   ░░░ ░░▒░▒░░                                                                     ░░░░▒░░░░   ░   ░   ░▒▓░ ░▓███████████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓█▒░  ░▒░  ░   ░ ░░▒░░░░                                                                               ░ ░░▒░▒░░ ░   ▒▒░ ░░▓▓█▓█▓███▓███▓███▓███▓███▓███▓███▓███
+███████████████████████████████████████████▓▓░░░▒▒▒░▒▒▒░▒░░                                                                                           ░░░░░░▒░░░▒▒▓▓████████████████████████████████████
+██████████████████████████████████████████▓█▓▓▒▒░░ ░ ░                                                                                                       ░░▓▓█▓█████████████████████████████████████
+█████████████████████████████████████████████████▓▒░                                              ░ ░ ░ ░ ░ ░ ░ ░ ░                                       ░▒▓▓██████████████████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓█▓█▓█▓█▓▒░                                    ░░▒░▒░░░░░░░▒░░ ░ ░░▒░░ ░░▒▒▒░░ ░       ░                   ░▒▓▓█▓█▓█▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███
+███████████████████████████████████████████████████████▓▓░                        ░░░░▒░▒░░░░░░░░░░ ░ ░ ░░░░░   ░░░░░   ░░░░▒▒▒░░                   ▒▒██████████████████████████████████████████████████
+██████████████████████████████████████████████████▓███▓█▓█▒▒                 ░░░░▒░░░░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░░▒░░ ░           ▒▒▓▓█▓█▓█▓█████████████████████████████████████████████
+█████████████████████████████████████████████████████████▓██▓▒░           ▒░▒░▒░░ ░░░ ░ ░ ░ ░ ░░░ ░░░ ░ ░ ░ ░ ░░░ ░ ░ ░░░ ░ ░ ░░░ ░░▒░▒░░░░░░░▒▓█▓██████████████████████████████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓█▓█▓█▓▓▒▒░░ ░░▒░▒░░   ░ ░   ░ ░ ░ ░   ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░   ░ ░ ░   ░ ░ ░  ░▒▓█▓█▓█▓█▓█▓█▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███
+█████████████████████████████████████████████████████████████████████████▒▒░░   ░░░░░   ░░░░░ ░ ░ ░ ░░░░░░░ ░ ░ ░░░░░░░   ░░░░░ ░░░░░░▓█████████████████████████████████████████████████████████████████
+██████████████████████████▓███████████████████████████████████▓███▓█▓█▓█▓█▓▓▒▒ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░ ░░▒▓█▓█▓█▓█████████████████████████████████████████████████████████████
+█████████████████████████████████████████████████████████████████████████████▓▓▒░ ░ ░ ░░░ ░ ░ ░░░ ░ ░ ░░░ ░░░ ░░░ ░ ░ ░░░░░░░ ░░▒▒██████████████████████████████████████████████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓█▓█▓▓░░   ░ ░ ░   ░ ░ ░   ░ ░ ░ ░░░ ░░░   ░ ░ ░ ░░▓▓█▓█▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███
+███████████████████████████████████████████████████████████████████████████████████▓▓░░   ░ ░░░   ░░▓▓███▓▒░    ░░░ ░░░░░ ░░▒▓██████████████████████████████████████████████████████████████████████████
+██████▓███████████████████████████████████████████████████████████████████████▓███▓█▓█▓▒░░   ░░▓▓█▓█▓█▓█▓█▓█▓▓░░   ░ ░   ░░▓▓█▓███▓███████████████████████████████████████████████████████▓█████████████
+█████████████████████████████████████████████████████████████████████████████████████████▓▓▓█████▓███████████▓███▓▓░░  ░▒▓██████████████████████████████████████████████████████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓█▓█▓███▓███▓███▓█▓█▓█▓█▓█▓█▓█▓█▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███
+████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+██████▓███████████████████████████████████▓███████████████████████████████████████████████████████████████████████▓███▓███████████████████████████████████████████████████████████▓█████████████████████
+████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███▓███
+████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████`;
+
+      // Inject the ASCII art, replacing ░▒ with slate-grey spans, keeping the rest lavender
+      const pre = document.getElementById('asciiArt');
+      // Use a simple split by character class: ░▒ become slate, all other (█▓) lavender
+      // We build innerHTML with span wrapping only for ░▒ to preserve exact characters and alignment
+      let html = '';
+      for (let i = 0; i < asciiBlock.length; i++) {
+        const ch = asciiBlock[i];
+        if (ch === '░' || ch === '▒') {
+          html += '<span class="slate">' + ch + '</span>';
+        } else if (ch === '█' || ch === '▓') {
+          html += '<span class="lavender">' + ch + '</span>';
+        } else {
+          html += ch;
+        }
+      }
+      pre.innerHTML = html;
+
+      // ─── 1. POPULATE POSTS ───
+      const posts = [
+        {
+          title: 'Building a Synthwave Renderer in Pure CSS',
+          date: '2026-02-14',
+          readTime: '8 min',
+          excerpt: 'Recreating the iconic sunset grid with repeating-linear-gradients and a single horizon line. No JavaScript, no canvas — just gradients and a lot of patience.',
+          glyph: '▓▒░\n░▓▒\n▒░▓'
+        },
+        {
+          title: 'Why I Still Write Assembly for Fun',
+          date: '2026-01-30',
+          readTime: '12 min',
+          excerpt: 'There\'s a meditative quality to hand-optimising a loop. This post walks through a tiny demoscene effect written in x86-64, from registers to pixels.',
+          glyph: '█▓█\n▓░▓\n█▓█'
+        },
+        {
+          title: 'CRT Shaders for the Web: A Love Letter',
+          date: '2026-01-12',
+          readTime: '6 min',
+          excerpt: 'Scanlines, phosphor glow, and a gentle flicker — how to fake the warmth of a real tube monitor in the browser without melting the GPU.',
+          glyph: '▒▓▒\n▓█▓\n▒▓▒'
+        },
+        {
+          title: 'RetroArch Setup for Pixel-Perfect Gaming',
+          date: '2025-12-20',
+          readTime: '10 min',
+          excerpt: 'Integer scaling, shaders, and the right aspect ratio. A complete guide to making 240p games look exactly like they did on your childhood TV.',
+          glyph: '░█░\n█▓█\n░█░'
+        },
+        {
+          title: 'Demoscene Tricks: Dithering and Palette Cycling',
+          date: '2025-11-08',
+          readTime: '7 min',
+          excerpt: 'Before shaders, we had ordered dithering and palette rotation. Revisiting the classic techniques that squeezed beauty out of 16 colors.',
+          glyph: '▓▓▓\n▒▒▒\n░░░'
+        },
+        {
+          title: 'A Terminal-Based Blog Engine in 200 Lines',
+          date: '2025-10-15',
+          readTime: '9 min',
+          excerpt: 'Markdown to HTML via awk, a Makefile, and a pure-CGI script. The result is a fast, dependency-free blog that works in any text browser.',
+          glyph: '█▒█\n▓░▓\n█▒█'
+        }
+      ];
+
+      const grid = document.getElementById('postGrid');
+      posts.forEach(p => {
+        const card = document.createElement('article');
+        card.className = 'post-card';
+        card.setAttribute('aria-label', 'Blog post: ' + p.title);
+        card.innerHTML = `
+          <div class="post-thumb" aria-hidden="true">
+            <pre class="pixel-glyph">${p.glyph}</pre>
+          </div>
+          <h3>${p.title}</h3>
+          <div class="post-meta">
+            <span>${p.date}</span>
+            <span>◈ ${p.readTime}</span>
+          </div>
+          <p class="post-excerpt">${p.excerpt}</p>
+          <a href="#" class="post-read-link" aria-label="Read more: ${p.title}">READ ▸</a>
+        `;
+        grid.appendChild(card);
+      });
+
+      // ─── 2. ABOUT SPRITE (32x32 pixel art placeholder) ───
+      // Build a simple 32x32 pixel portrait using palette colors: ink, lavender, slate, space-indigo, shadow-grey
+      const spriteEl = document.getElementById('aboutSprite');
+      const palette = ['var(--ink-black)', 'var(--lavender-grey)', 'var(--slate-grey)', 'var(--space-indigo)', 'var(--shadow-grey)'];
+      // Create a deterministic but interesting pixel pattern (a stylized face/terminal)
+      let spriteHTML = '';
+      for (let row = 0; row < 32; row++) {
+        for (let col = 0; col < 32; col++) {
+          let colorIndex;
+          // Head shape: circle-ish in center
+          const dx = col - 16;
+          const dy = row - 14;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 9) {
+            // inside face area
+            if (dist < 3) colorIndex = 1; // lavender eyes/glow
+            else if (dist < 7) colorIndex = 2; // slate skin
+            else colorIndex = 4; // shadow outline
+          } else {
+            // background
+            if ((row + col) % 7 === 0) colorIndex = 3; // space indigo specks
+            else colorIndex = 0; // ink black
+          }
+          spriteHTML += `<span style="background:${palette[colorIndex]}"></span>`;
+        }
+      }
+      spriteEl.innerHTML = spriteHTML;
+
+      // ─── 3. SCROLL REVEAL & STICKY BAR BORDER ───
+      const revealEls = document.querySelectorAll('.reveal');
+      const topBar = document.getElementById('topBar');
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      revealEls.forEach(el => observer.observe(el));
+
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 10) {
+          topBar.classList.add('scrolled');
+        } else {
+          topBar.classList.remove('scrolled');
+        }
+      }, { passive: true });
+
+      // ─── 4. KEYBOARD FOCUS (optional smooth for accessibility) ───
+      // Already handled by CSS focus-visible
+
+    })();
+  </script>
 </body>
 </html>
