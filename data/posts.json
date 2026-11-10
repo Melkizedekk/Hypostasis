@@ -21,10 +21,10 @@
       "glyph": "▓▒░\n░▓▒\n▒░▓",
       "tags": [],
       "content": "",
-      "status": "draft",
+      "status": "published",
       "featured": false,
       "createdAt": "2026-11-10T17:32:02.277Z",
-      "updatedAt": "2026-11-10T17:32:02.277Z"
+      "updatedAt": "2026-11-10T17:35:56.250Z"
     },
     {
       "id": "d0df3d05-afd6-4c7c-9eeb-97d23e34f4eb",
@@ -43,5 +43,5 @@
       "updatedAt": "2026-11-09T14:02:39.560Z"
     }
   ],
-  "updatedAt": "2026-11-10T17:32:02.277Z"
+  "updatedAt": "2026-11-10T17:35:56.250Z"
 }
